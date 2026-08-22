@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: olist-postgres
+    environment:
+      POSTGRES_USER: olist
+      POSTGRES_PASSWORD: olist123
+      POSTGRES_DB: olist
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U olist -d olist"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

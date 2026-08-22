@@ -1,0 +1,11 @@
+
+mlops-task1/data/
+
+*.parquet
+
+# Jupyter و Python
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+Thumbs.db
+.DS_Store

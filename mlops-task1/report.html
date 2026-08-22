@@ -1,0 +1,1054 @@
+<title>Olist — تقرير تحليلي واستكشاف المشاريع</title>
+<style>
+  :root {
+    --paper:      #F4F6F8;
+    --surface:    #FFFFFF;
+    --surface-2:  #EDF0F3;
+    --ink:        #131820;
+    --ink-2:      #3D4653;
+    --ink-3:      #6B7583;
+    --rule:       #D4DAE1;
+    --rule-soft:  #E4E9ED;
+    --accent:     #9A6A0E;
+    --accent-ink: #7C5409;
+    --accent-wash:#F5E9CF;
+    --late:       #A93A2E;
+    --late-wash:  #F3DDD9;
+    --ontime:     #16665A;
+    --ontime-wash:#D8EAE6;
+    --shadow:     0 1px 2px rgba(19,24,32,.05), 0 8px 24px -12px rgba(19,24,32,.18);
+
+    --sans: "Noto Kufi Arabic", "Dubai", "Segoe UI", Tahoma, system-ui, sans-serif;
+    --body: "Noto Naskh Arabic", "Sakkal Majalla", "Segoe UI", Tahoma, system-ui, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:      #0E1218;
+      --surface:    #161C24;
+      --surface-2:  #1D242E;
+      --ink:        #E8ECF1;
+      --ink-2:      #B4BDC8;
+      --ink-3:      #7E8996;
+      --rule:       #2B333E;
+      --rule-soft:  #222A34;
+      --accent:     #D9A64A;
+      --accent-ink: #E8BC6B;
+      --accent-wash:#2E2718;
+      --late:       #DF7264;
+      --late-wash:  #33201D;
+      --ontime:     #4EBBA4;
+      --ontime-wash:#122B27;
+      --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0E1218;
+    --surface:    #161C24;
+    --surface-2:  #1D242E;
+    --ink:        #E8ECF1;
+    --ink-2:      #B4BDC8;
+    --ink-3:      #7E8996;
+    --rule:       #2B333E;
+    --rule-soft:  #222A34;
+    --accent:     #D9A64A;
+    --accent-ink: #E8BC6B;
+    --accent-wash:#2E2718;
+    --late:       #DF7264;
+    --late-wash:  #33201D;
+    --ontime:     #4EBBA4;
+    --ontime-wash:#122B27;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+
+  :root[data-theme="light"] {
+    --paper:      #F4F6F8;
+    --surface:    #FFFFFF;
+    --surface-2:  #EDF0F3;
+    --ink:        #131820;
+    --ink-2:      #3D4653;
+    --ink-3:      #6B7583;
+    --rule:       #D4DAE1;
+    --rule-soft:  #E4E9ED;
+    --accent:     #9A6A0E;
+    --accent-ink: #7C5409;
+    --accent-wash:#F5E9CF;
+    --late:       #A93A2E;
+    --late-wash:  #F3DDD9;
+    --ontime:     #16665A;
+    --ontime-wash:#D8EAE6;
+    --shadow:     0 1px 2px rgba(19,24,32,.05), 0 8px 24px -12px rgba(19,24,32,.18);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  .doc {
+    direction: rtl;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.85;
+    padding: 0 20px 96px;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  /* ---------- masthead ---------- */
+
+  .masthead {
+    padding: 72px 0 32px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    direction: ltr;
+    text-align: right;
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(30px, 5.2vw, 46px);
+    line-height: 1.28;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 0 0 16px;
+  }
+
+  .standfirst {
+    font-size: 19px;
+    line-height: 1.8;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  /* ---------- readout strip ---------- */
+
+  .readout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 36px 0 0;
+  }
+
+  .readout > div {
+    background: var(--surface);
+    padding: 16px 18px;
+  }
+
+  .readout dt {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 7px;
+  }
+
+  .readout dd {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    margin: 0;
+    direction: ltr;
+    text-align: right;
+  }
+
+  .readout dd.hot { color: var(--late); }
+
+  /* ---------- sections ---------- */
+
+  section { margin: 68px 0 0; }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  h2 .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-ink);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 40px 0 4px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 26px 0 2px;
+  }
+
+  p { margin: 14px 0; max-width: 66ch; }
+
+  ul, ol { max-width: 66ch; padding-inline-start: 24px; margin: 14px 0; }
+  li { margin: 8px 0; }
+
+  strong { font-weight: 700; color: var(--ink); }
+
+  code, .n {
+    font-family: var(--mono);
+    font-size: .88em;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: embed;
+  }
+
+  code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--ink-2);
+  }
+
+  a { color: var(--accent-ink); }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-inline-start: 3px solid var(--accent);
+    padding: 18px 22px;
+    margin: 26px 0;
+    box-shadow: var(--shadow);
+  }
+
+  .callout p { margin: 0; max-width: none; }
+  .callout p + p { margin-top: 10px; }
+
+  .callout .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .callout.warn { border-inline-start-color: var(--late); }
+  .callout.warn .tag { color: var(--late); }
+
+  /* ---------- figures / tables ---------- */
+
+  figure {
+    margin: 30px 0;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    box-shadow: var(--shadow);
+  }
+
+  figcaption {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--surface-2);
+  }
+
+  .scroll { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  th {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-3);
+    text-align: start;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  td.num, th.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+    direction: ltr;
+    white-space: nowrap;
+  }
+
+  td.label { white-space: nowrap; }
+
+  /* inline bar */
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    direction: ltr;
+    min-width: 190px;
+  }
+
+  .bar .track {
+    flex: 1;
+    height: 7px;
+    background: var(--surface-2);
+    position: relative;
+  }
+
+  .bar .fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    background: var(--accent);
+  }
+
+  .bar .fill.hot   { background: var(--late); }
+  .bar .fill.cool  { background: var(--ontime); }
+
+  .bar .val {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    width: 5.4ch;
+    text-align: right;
+    flex: none;
+  }
+
+  /* pills */
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .pill.late   { color: var(--late);   background: var(--late-wash); }
+  .pill.ontime { color: var(--ontime); background: var(--ontime-wash); }
+  .pill.no     { color: var(--late);   background: var(--late-wash); }
+  .pill.yes    { color: var(--ontime); background: var(--ontime-wash); }
+
+  /* ---------- finding cards ---------- */
+
+  .findings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+    margin: 30px 0;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .finding .big {
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    direction: ltr;
+    text-align: right;
+    color: var(--accent-ink);
+  }
+
+  .finding .big.hot { color: var(--late); }
+
+  .finding h4 {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.5;
+  }
+
+  .finding p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    max-width: none;
+  }
+
+  /* ---------- tiered project list ---------- */
+
+  .tier {
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    margin: 22px 0;
+    box-shadow: var(--shadow);
+  }
+
+  .tier > header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--surface-2);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tier > header .t-name {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .tier > header .t-note {
+    font-size: 13.5px;
+    color: var(--ink-3);
+  }
+
+  .tier ol { margin: 0; padding: 8px 22px 18px; padding-inline-start: 46px; }
+  .tier li { margin: 14px 0; }
+  .tier li strong { display: block; font-family: var(--sans); font-size: 15.5px; }
+  .tier li p { margin: 4px 0 0; font-size: 14.5px; color: var(--ink-2); }
+
+  .tier.no-go > header { background: var(--late-wash); }
+  .tier.no-go > header .t-name { color: var(--late); }
+
+  /* ---------- roadmap ---------- */
+
+  .roadmap { display: flex; flex-direction: column; gap: 0; margin: 26px 0; }
+
+  .stage {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 18px;
+    border-inline-start: 2px solid var(--rule);
+    padding: 0 22px 22px 0;
+    position: relative;
+    margin-inline-start: 7px;
+  }
+
+  .stage::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -7px;
+    top: 7px;
+    width: 12px;
+    height: 12px;
+    background: var(--paper);
+    border: 2px solid var(--rule);
+    border-radius: 50%;
+  }
+
+  .stage.done::before { background: var(--ontime); border-color: var(--ontime); }
+  .stage.now::before  { background: var(--accent); border-color: var(--accent); }
+
+  .stage .s-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 15.5px;
+    grid-column: 1 / -1;
+  }
+
+  .stage .s-body {
+    grid-column: 1 / -1;
+    font-size: 14.5px;
+    color: var(--ink-2);
+    line-height: 1.7;
+  }
+
+  /* ---------- questions ---------- */
+
+  .qlist { counter-reset: q; list-style: none; padding: 0; margin: 26px 0; max-width: none; }
+
+  .qlist li {
+    counter-increment: q;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    margin: 0;
+    max-width: none;
+  }
+
+  .qlist li::before {
+    content: "Q" counter(q);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+    padding-top: 5px;
+  }
+
+  .qlist li p { margin: 0; max-width: none; }
+  .qlist li p + p { margin-top: 5px; font-size: 14.5px; color: var(--ink-2); }
+
+  footer.doc-foot {
+    margin: 72px 0 0;
+    padding-top: 22px;
+    border-top: 2px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 2;
+  }
+
+  @media (max-width: 620px) {
+    .doc { font-size: 16px; padding: 0 16px 64px; }
+    th, td { padding-inline: 13px; }
+    .masthead { padding-top: 48px; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .finding, .tier, figure { transition: none; }
+  }
+</style>
+
+<div class="doc">
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">MLOps Training 2026/2027 · Task 1 · Olist Dataset</p>
+    <h1>من قاعدة بيانات إلى قرار: ماذا تقول بيانات Olist فعليًا، وأي مشروع يستحق البناء؟</h1>
+    <p class="standfirst">
+      تقرير تحليلي مبني بالكامل على استعلامات نُفِّذت على قاعدة البيانات المحلية بعد تحميلها،
+      مع نموذج أساسي مُدرَّب فعليًا لقياس ما هو قابل للتحقيق — لا تقديرات ولا أرقام منقولة.
+    </p>
+
+    <dl class="readout">
+      <div><dt>Orders</dt><dd>99,441</dd></div>
+      <div><dt>Rows loaded</dt><dd>1,550,922</dd></div>
+      <div><dt>Coverage</dt><dd>2016-09 → 2018-10</dd></div>
+      <div><dt>Late rate</dt><dd class="hot">8.11%</dd></div>
+      <div><dt>Baseline AUC</dt><dd>0.679</dd></div>
+    </dl>
+  </header>
+
+  <!-- ===================== 1 ===================== -->
+  <section>
+    <h2><span class="num">01</span> الملخص التنفيذي</h2>
+    <p>
+      البيانات تغطي سوقًا برازيليًا إلكترونيًا على مدى عامين. من أصل <span class="n">96,470</span>
+      طلبًا مسلَّمًا، وصل <span class="n">7,826</span> طلبًا بعد الموعد الموعود. ثلاث نتائج تحدد
+      اتجاه المشروع بأكمله:
+    </p>
+
+    <div class="findings">
+      <div class="finding">
+        <span class="big hot">2.57</span>
+        <h4>التأخير يدمّر التقييم</h4>
+        <p>متوسط تقييم الطلب المتأخر <strong>2.57</strong> مقابل <strong>4.29</strong> للطلب في وقته. نسبة التقييمات السيئة تقفز من 9.2% إلى 54.0%.</p>
+      </div>
+      <div class="finding">
+        <span class="big">0.679</span>
+        <h4>قابلية تنبؤ محدودة عند الشراء</h4>
+        <p>نموذج أساسي بمعلومات لحظة الطلب فقط بلغ <strong>ROC-AUC 0.679</strong>. بإضافة توقيت الناقل يرتفع إلى <strong>0.791</strong>.</p>
+      </div>
+      <div class="finding">
+        <span class="big">11.2</span>
+        <h4>احتياطي زمني مهدور</h4>
+        <p>التسليم الفعلي <strong>12.6</strong> يومًا مقابل وعد <strong>23.7</strong> يومًا — احتياطي 11 يومًا، ومع ذلك يقع التأخير.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="tag">الصياغة المقترحة للمناقشة</span>
+      <p>
+        المشروع ليس «تنبؤًا بالتأخير»، بل <strong>حماية 8.8% من الإيرادات</strong>
+        ومنع أكثر من نصف العملاء المتضررين من ترك تقييم سلبي علني.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== 2 ===================== -->
+  <section>
+    <h2><span class="num">02</span> الأثر التجاري — لماذا يستحق المشروع التمويل</h2>
+    <p>هذا هو الجدول الذي يجب أن يُفتتح به أي عرض تقديمي. الفرق ليس تحسينًا هامشيًا، بل انهيار كامل في رضا العميل:</p>
+
+    <figure>
+      <figcaption>Review score · delivered orders · n = 96,353</figcaption>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>الحالة</th>
+              <th class="num">الطلبات</th>
+              <th class="num">متوسط التقييم</th>
+              <th>نسبة 1–2 نجمة</th>
+              <th class="num">5 نجوم</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill ontime">وصلت بالوقت</span></td>
+              <td class="num">88,653</td>
+              <td class="num">4.29</td>
+              <td><div class="bar"><div class="track"><div class="fill cool" style="width:17.1%"></div></div><span class="val">9.2%</span></div></td>
+              <td class="num">62.4%</td>
+            </tr>
+            <tr>
+              <td><span class="pill late">وصلت متأخرة</span></td>
+              <td class="num">7,700</td>
+              <td class="num">2.57</td>
+              <td><div class="bar"><div class="track"><div class="fill hot" style="width:100%"></div></div><span class="val">54.0%</span></div></td>
+              <td class="num">22.2%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <p>
+      التأخير يضاعف احتمال التقييم السيئ نحو <strong>ست مرات</strong>. وبلغة المال:
+      <span class="n">1,351,625</span> ريالًا برازيليًا من أصل <span class="n">15,418,395</span> —
+      أي <strong>8.77% من الإيرادات</strong> — مرتبطة بطلبات وصلت متأخرة.
+    </p>
+
+    <h3>شدة التأخير: ليست حالات هامشية</h3>
+    <figure>
+      <figcaption>Lateness severity · n = 7,826 late orders</figcaption>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>مدى التأخير</th><th class="num">الطلبات</th><th>النسبة من المتأخرات</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">يوم واحد أو أقل</td><td class="num">1,292</td><td><div class="bar"><div class="track"><div class="fill" style="width:71%"></div></div><span class="val">16.5%</span></div></td></tr>
+            <tr><td class="label">1–3 أيام</td><td class="num">1,370</td><td><div class="bar"><div class="track"><div class="fill" style="width:75%"></div></div><span class="val">17.5%</span></div></td></tr>
+            <tr><td class="label">3–7 أيام</td><td class="num">1,819</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:100%"></div></div><span class="val">23.2%</span></div></td></tr>
+            <tr><td class="label">7–14 يومًا</td><td class="num">1,790</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:98%"></div></div><span class="val">22.9%</span></div></td></tr>
+            <tr><td class="label">14–30 يومًا</td><td class="num">1,195</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:66%"></div></div><span class="val">15.3%</span></div></td></tr>
+            <tr><td class="label">أكثر من 30 يومًا</td><td class="num">360</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:20%"></div></div><span class="val">4.6%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <p>
+      <strong>66% من الطلبات المتأخرة تتجاوز ثلاثة أيام</strong>، و<span class="n">360</span> طلبًا تجاوز الشهر —
+      وأسوأ حالة بلغت <strong>189 يومًا</strong>. هذه كوارث خدمة عملاء، لا انحرافات بسيطة.
+    </p>
+  </section>
+
+  <!-- ===================== 3 ===================== -->
+  <section>
+    <h2><span class="num">03</span> مسبّبات التأخير</h2>
+
+    <h3>الجغرافيا هي العامل الأول</h3>
+    <p>
+      حسبت المسافة بين البائع والعميل بصيغة <strong>haversine</strong> بعد تجميع إحداثيات كل رمز بريدي
+      من جدول <code>geolocation</code>. التغطية ممتازة: <strong>99.7%</strong> من العملاء و<strong>99.8%</strong>
+      من البائعين لهم إحداثيات — وهذا هو السبب الحقيقي لوجود جدول المليون صف.
+    </p>
+
+    <figure>
+      <figcaption>Late rate by seller↔customer distance (haversine)</figcaption>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>المسافة</th><th class="num">العناصر</th><th>نسبة التأخير</th><th class="num">متوسط أيام التسليم</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">أقل من 100 كم</td><td class="num">20,479</td><td><div class="bar"><div class="track"><div class="fill" style="width:49%"></div></div><span class="val">6.4%</span></div></td><td class="num">6.5</td></tr>
+            <tr><td class="label">100–300 كم</td><td class="num">15,279</td><td><div class="bar"><div class="track"><div class="fill" style="width:48%"></div></div><span class="val">6.3%</span></div></td><td class="num">9.9</td></tr>
+            <tr><td class="label">300–700 كم</td><td class="num">41,618</td><td><div class="bar"><div class="track"><div class="fill" style="width:59%"></div></div><span class="val">7.7%</span></div></td><td class="num">12.8</td></tr>
+            <tr><td class="label">700–1500 كم</td><td class="num">22,495</td><td><div class="bar"><div class="track"><div class="fill" style="width:66%"></div></div><span class="val">8.6%</span></div></td><td class="num">15.5</td></tr>
+            <tr><td class="label">أكثر من 1500 كم</td><td class="num">9,782</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:100%"></div></div><span class="val">13.0%</span></div></td><td class="num">20.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <p>
+      الشحن <strong>داخل الولاية</strong>: 5.98% تأخير و7.9 أيام. <strong>بين الولايات</strong>: 9.00% تأخير و15.0 يومًا.
+      أسوأ الولايات: <span class="n">MA</span> بنسبة <strong>19.7%</strong>، ثم <span class="n">CE</span> بـ15.3% و<span class="n">BA</span> بـ14.0%.
+      ولاية <span class="n">RJ</span> لافتة تحديدًا — <span class="n">12,350</span> طلبًا بنسبة 13.5%: حجم كبير ومشكلة كبيرة معًا.
+    </p>
+
+    <h3>تسليم الشحنة للناقل هو الإشارة الأقوى</h3>
+
+    <figure>
+      <figcaption>Late rate by purchase→carrier handover delay</figcaption>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>زمن التسليم للناقل</th><th class="num">الطلبات</th><th>نسبة التأخير</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">خلال يوم</td><td class="num">18,980</td><td><div class="bar"><div class="track"><div class="fill" style="width:10%"></div></div><span class="val">4.1%</span></div></td></tr>
+            <tr><td class="label">1–3 أيام</td><td class="num">40,309</td><td><div class="bar"><div class="track"><div class="fill" style="width:15%"></div></div><span class="val">6.5%</span></div></td></tr>
+            <tr><td class="label">3–7 أيام</td><td class="num">29,054</td><td><div class="bar"><div class="track"><div class="fill" style="width:21%"></div></div><span class="val">8.9%</span></div></td></tr>
+            <tr><td class="label">7–14 يومًا</td><td class="num">6,189</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:41%"></div></div><span class="val">17.6%</span></div></td></tr>
+            <tr><td class="label">أكثر من 14 يومًا</td><td class="num">1,772</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:100%"></div></div><span class="val">42.7%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <p>
+      تأخر البائع في تسليم الشحنة يرفع احتمال التأخير <strong>عشرة أضعاف</strong>.
+      لكن هذه المعلومة <strong>غير متاحة لحظة الشراء</strong> — وهي بالضبط النقطة التي تحدد بنية المشروع (القسم 04).
+    </p>
+
+    <h3>عوامل مؤكدة أخرى</h3>
+    <ul>
+      <li><strong>الموسمية:</strong> مارس 2018 بلغ <strong>21.4%</strong> من <span class="n">7,003</span> طلبات — قرابة ثلاثة أضعاف المعدل. فبراير 2018: 16.0%، ونوفمبر 2017 (الجمعة السوداء): 14.3%.</li>
+      <li><strong>البائع مهم:</strong> من <span class="n">236</span> بائعًا لديهم 100 طلب فأكثر، الوسيط <span class="n">6.8%</span>، المئين التسعون <span class="n">12.8%</span>، والأسوأ <strong>25.0%</strong>.</li>
+      <li><strong>قيمة الشحن:</strong> من 6.0% (أقل من 10 BRL) إلى 10.3% (أكثر من 40 BRL) — لأنها وكيل عن المسافة والوزن.</li>
+      <li><strong>الفئات الأسوأ:</strong> <span class="n">electronics</span> بـ9.8%، <span class="n">health_beauty</span> بـ9.1%، <span class="n">office_furniture</span> بـ8.9%.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="tag">نتيجة مضادة للحدس — لم تُحسم بعد</span>
+      <p>
+        الطلبات من بائعين متعددين تتأخر <strong>أقل</strong> (1.5% مقابل 8.2%) وتصل <strong>أسرع</strong>
+        (9.2 يومًا مقابل 12.6). التفسير المرجح هو أثر انتقاء: تركّز هذه الطلبات في مناطق حضرية كثيفة
+        بخدمات لوجستية أسرع.
+      </p>
+      <p>
+        <strong>لم أتحقق من هذا</strong> وأدرجه كسؤال مفتوح — لأن ادعاء «تعدد البائعين يحسّن التسليم»
+        بلا إثبات هو تحديدًا نوع الخطأ الذي يفسد المشاريع.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== 4 ===================== -->
+  <section>
+    <h2><span class="num">04</span> الفخاخ التقنية</h2>
+    <p>هذا أهم قسم في التقرير: ما يميّز مشروعًا محترفًا عن دفتر Kaggle عادي ليس النموذج، بل تجنّب هذه الفخاخ.</p>
+
+    <h3>تسريب البيانات (Data Leakage)</h3>
+    <p>جدول <code>orders</code> يحوي أربعة طوابع زمنية، وثلاثة منها لا توجد لحظة الشراء:</p>
+
+    <figure>
+      <figcaption>Feature availability at prediction time</figcaption>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>العمود</th><th>متاح لحظة الشراء؟</th><th>ملاحظة</th></tr></thead>
+          <tbody>
+            <tr><td><code>order_purchase_timestamp</code></td><td><span class="pill yes">نعم</span></td><td>نقطة الصفر</td></tr>
+            <tr><td><code>order_estimated_delivery_date</code></td><td><span class="pill yes">نعم</span></td><td>الوعد المعروض للعميل</td></tr>
+            <tr><td><code>order_approved_at</code></td><td><span class="pill no">لا</span></td><td>يظهر بعد قبول الدفع</td></tr>
+            <tr><td><code>order_delivered_carrier_date</code></td><td><span class="pill no">لا</span></td><td>يظهر عند التسليم للناقل</td></tr>
+            <tr><td><code>order_delivered_customer_date</code></td><td><span class="pill no">لا</span></td><td>هو الهدف نفسه</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <div class="callout warn">
+      <span class="tag">الفخ</span>
+      <p>
+        استخدام أي من الأعمدة الثلاثة الأخيرة في نموذج «لحظة الشراء» يعطي نتائج ممتازة زائفة تنهار في الإنتاج.
+        <strong>معظم الـ notebooks العامة على Kaggle تقع في هذا الفخ</strong> — وهي فرصتك للتميّز في المناقشة.
+      </p>
+    </div>
+
+    <p><strong>الحل التصميمي: نموذجان، لا نموذج واحد.</strong></p>
+    <ul>
+      <li><strong>المرحلة أ — لحظة الشراء:</strong> لتحديد الموعد المعروض للعميل وتسعير الشحن.</li>
+      <li><strong>المرحلة ب — بعد التسليم للناقل:</strong> لإنذار فريق العمليات مبكرًا بالطلبات المهددة.</li>
+    </ul>
+
+    <h3>انحراف البيانات (Drift) — موثق فعليًا</h3>
+    <p>عند التقسيم الزمني عند <span class="n">2018-04-01</span>:</p>
+
+    <figure>
+      <figcaption>Target drift across the chronological split</figcaption>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>المجموعة</th><th class="num">الطلبات</th><th>نسبة التأخير</th></tr></thead>
+          <tbody>
+            <tr><td class="label">التدريب (قبل 2018-04)</td><td class="num">64,320</td><td><div class="bar"><div class="track"><div class="fill hot" style="width:100%"></div></div><span class="val">9.16%</span></div></td></tr>
+            <tr><td class="label">الاختبار (بعد 2018-04)</td><td class="num">32,150</td><td><div class="bar"><div class="track"><div class="fill" style="width:66%"></div></div><span class="val">6.02%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <p>
+      نسبة الهدف نفسها تغيّرت بمقدار الثلث بين الفترتين. هذه ليست مشكلة في البيانات — هي
+      <strong>بالضبط السبب الذي يجعل MLOps ضروريًا</strong>: أي نموذج يُدرَّب مرة ويُترك سينحرف.
+      هذا المثال جاهز لتبرير المراقبة وإعادة التدريب في التاسكات القادمة.
+    </p>
+
+    <h3>عدم توازن الفئات: الدقة مقياس مضلل</h3>
+    <div class="callout warn">
+      <span class="tag">تحذير من مقياس زائف</span>
+      <p>
+        نموذج يقول «كل شيء سيصل بالوقت» يحقق <strong>93.98% دقة</strong> على مجموعة الاختبار —
+        ويكتشف <strong>صفرًا</strong> من <span class="n">1,936</span> طلبًا متأخرًا.
+      </p>
+      <p>المقاييس الصحيحة: <strong>PR-AUC</strong>، و<strong>Recall</strong> عند حد التنبيه، و<strong>Lift</strong>.</p>
+    </div>
+
+    <p>
+      كذلك يجب أن يكون التقسيم <strong>زمنيًا لا عشوائيًا</strong>؛ التقسيم العشوائي يسمح للنموذج
+      برؤية طلبات من المستقبل أثناء التدريب ويرفع كل المقاييس بشكل وهمي.
+    </p>
+  </section>
+
+  <!-- ===================== 5 ===================== -->
+  <section>
+    <h2><span class="num">05</span> النتيجة الأساسية الفعلية</h2>
+    <p>
+      دربت <code>HistGradientBoostingClassifier</code> بتقسيم زمني، وحسبت إحصاءات البائع من بيانات
+      التدريب فقط منعًا للتسريب. النتائج على مجموعة الاختبار:
+    </p>
+
+    <figure>
+      <figcaption>Baseline results · chronological split · test n = 32,150</figcaption>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>السيناريو</th><th class="num">ROC-AUC</th><th class="num">PR-AUC</th><th class="num">Recall @ top 10%</th><th class="num">Lift</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="label">أ. لحظة الشراء فقط</td>
+              <td class="num">0.679</td><td class="num">0.127</td><td class="num">23.2%</td><td class="num">2.32×</td>
+            </tr>
+            <tr>
+              <td class="label">ب. + توقيت الناقل</td>
+              <td class="num"><strong>0.791</strong></td><td class="num"><strong>0.328</strong></td><td class="num"><strong>41.1%</strong></td><td class="num"><strong>4.11×</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </figure>
+
+    <h4>كيف تُقرأ هذه الأرقام في المناقشة</h4>
+    <ul>
+      <li><strong>0.679 نتيجة متواضعة وصادقة.</strong> لحظة الشراء، معظم ما سيحدد التأخير لم يقع بعد. من يعرض AUC بحدود 0.95 على هذه البيانات فهو غالبًا يستخدم أعمدة مسرِّبة.</li>
+      <li><strong>الفارق 0.679 ← 0.791 هو المنتج الحقيقي:</strong> معلومة واحدة إضافية تضاعف تقريبًا القدرة على الالتقاط، وهذا ما يبرر خط أنابيب من مرحلتين.</li>
+      <li><strong>Lift = 4.11× هي اللغة التي يفهمها العمل:</strong> لو راجع فريق العمليات 10% فقط من الطلبات التي يرشّحها النموذج، سيمسك <strong>41% من كل حالات التأخير</strong>.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== 6 ===================== -->
+  <section>
+    <h2><span class="num">06</span> أفكار المشاريع القابلة للبناء</h2>
+    <p>مرتبة حسب ما تدعمه البيانات فعليًا — لا حسب جاذبية الفكرة.</p>
+
+    <div class="tier">
+      <header>
+        <span class="t-name">المستوى الأول — مؤكدة الجدوى</span>
+        <span class="t-note">البيانات تدعمها بالكامل والأساس المرجعي مثبت</span>
+      </header>
+      <ol>
+        <li>
+          <strong>نظام التنبؤ بتأخر التسليم على مرحلتين</strong>
+          <p>خدمة تعمل لحظة الشراء ثم تُحدَّث عند التسليم للناقل. المخرجات: احتمال التأخير + سبب التصنيف. هذا هو المشروع الأساسي للتراك، وأساسه المرجعي 0.679 / 0.791 مثبت أعلاه.</p>
+        </li>
+        <li>
+          <strong>تقدير موعد تسليم ديناميكي (Regression)</strong>
+          <p>بدل التصنيف، تنبّأ بعدد أيام التسليم مباشرة. <strong>أقوى تجاريًا من التصنيف</strong>: البيانات تُظهر احتياطيًا قدره 11 يومًا، ونموذج جيد يقصّر الوعد للطلبات الآمنة (ميزة تنافسية) ويطيله للخطرة (حماية من التقييم السيئ). مقياس النجاح: تقليل الاحتياطي مع تثبيت نسبة التأخير.</p>
+        </li>
+        <li>
+          <strong>بطاقة أداء البائعين (Seller Scorecard)</strong>
+          <p>236 بائعًا بحجم كافٍ وتباين من 0% إلى 25%. لوحة تصنيف تُحدَّث دوريًا مع تنبيه للبائعين المتدهورين. مشروع هندسة بيانات أكثر منه ML — ممتاز لإظهار مهارات خطوط الأنابيب.</p>
+        </li>
+        <li>
+          <strong>نظام إنذار مبكر تشغيلي</strong>
+          <p>الاستخدام المباشر لنتيجة Lift = 4.11×: قائمة يومية بأخطر 10% من الطلبات النشطة لفريق خدمة العملاء للتواصل الاستباقي. <strong>أسرع المشاريع تحوّلًا إلى قيمة فعلية.</strong></p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="tier">
+      <header>
+        <span class="t-name">المستوى الثاني — ممكنة مع تحفظات</span>
+        <span class="t-note">قابلة للتنفيذ بشرط معالجة قيد محدد</span>
+      </header>
+      <ol start="5">
+        <li>
+          <strong>التنبؤ بالتقييم السلبي</strong>
+          <p>هدف بديل: هل سيعطي العميل 1–2 نجمة؟ البيانات قوية (99,224 تقييمًا) والارتباط بالتأخير مثبت. <em>التحفظ:</em> التقييم يتأثر بعوامل خارج البيانات كجودة المنتج والتغليف.</p>
+        </li>
+        <li>
+          <strong>تحليل نصوص التقييمات (NLP)</strong>
+          <p><strong>40,977</strong> تقييمًا يحوي نصًا (41.3%) و11,568 يحوي عنوانًا — حجم كافٍ لتصنيف الشكاوى. <em>التحفظ:</em> النصوص بالبرتغالية، فيلزم نموذج متعدد اللغات مثل XLM-R أو ترجمة آلية أولًا.</p>
+        </li>
+        <li>
+          <strong>التنبؤ بحجم الطلبات (Demand Forecasting)</strong>
+          <p>سلسلة زمنية لأكثر من عامين. <em>شرط إلزامي:</em> استبعاد سبتمبر وأكتوبر 2018 (16 و4 طلبات فقط مقابل ~6,500 شهريًا) وإلا سيتعلم النموذج انهيارًا وهميًا.</p>
+        </li>
+        <li>
+          <strong>كشف الشذوذ اللوجستي</strong>
+          <p>رصد الأنماط الشاذة كطلب استغرق 189 يومًا. مفيد، لكن الحالات نادرة فالتقييم صعب.</p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="tier no-go">
+      <header>
+        <span class="t-name">المستوى الثالث — غير موصى بها</span>
+        <span class="t-note">البيانات لا تدعمها، ولدينا الرقم الذي يثبت ذلك</span>
+      </header>
+      <ol start="9">
+        <li>
+          <strong>نظام توصيات (Recommender)</strong>
+          <p><strong>غير قابل للتطبيق.</strong> 96.88% من العملاء اشتروا مرة واحدة فقط و2.86% مرتين. لا يوجد تاريخ تفاعل كافٍ لأي فلترة تعاونية.</p>
+        </li>
+        <li>
+          <strong>التنبؤ بفقدان العملاء (Churn / CLV)</strong>
+          <p>للسبب نفسه — بلا تكرار شراء لا يوجد مفهوم واضح للـ churn.</p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="callout">
+      <span class="tag">ملاحظة للمناقشة</span>
+      <p>
+        القدرة على قول «هذا المشروع غير ممكن ولديّ الرقم الذي يثبت ذلك» أقوى من اقتراح عشرة مشاريع بلا فحص.
+        الفكرتان 9 و10 تُطرحان كثيرًا في مثل هذه التدريبات.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== 7 ===================== -->
+  <section>
+    <h2><span class="num">07</span> حدود البيانات</h2>
+    <p>نقاط يجب ذكرها صراحةً في أي مناقشة، لأن إغفالها يفسد النتائج لاحقًا:</p>
+    <ul>
+      <li><strong>لا يوجد سلوك تصفح ولا سلة متروكة</strong> — البيانات معاملاتية بحتة وتبدأ من لحظة إتمام الشراء.</li>
+      <li><strong><code>customer_id</code> ليس معرّف الشخص.</strong> المعرّف الحقيقي هو <code>customer_unique_id</code>؛ الخلط بينهما خطأ شائع يفسد أي تحليل للعملاء المتكررين.</li>
+      <li><strong>البيانات مبتورة في نهايتها.</strong> سبتمبر 2018 يحوي 16 طلبًا وأكتوبر يحوي 4، مقابل ~6,500 شهريًا في الأشهر الطبيعية.</li>
+      <li><strong>قيم مفقودة تحتاج قرارًا صريحًا:</strong> <span class="n">2,965</span> طلبًا بلا تاريخ تسليم، منها 8 بحالة <code>delivered</code>؛ و<span class="n">1,537</span> عنصرًا بلا فئة منتج.</li>
+      <li><strong>الهدف قابل للتلاعب:</strong> التأخير يُقاس مقابل وعد الشركة لا مقابل معيار موضوعي — لو قصّرت الشركة وعودها لارتفعت نسبة التأخير رغم ثبات الأداء اللوجستي.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== 8 ===================== -->
+  <section>
+    <h2><span class="num">08</span> خارطة الطريق لبقية التراك</h2>
+
+    <div class="roadmap">
+      <div class="stage done">
+        <span class="s-title">1 · البيانات — مكتمل</span>
+        <span class="s-body">PostgreSQL 16 في Docker، تسعة جداول بعلاقات كاملة، 1.55 مليون صف محمّلة والتحقق ناجح.</span>
+      </div>
+      <div class="stage now">
+        <span class="s-title">2 · التحليل الاستكشافي</span>
+        <span class="s-body">معظم النتائج جاهزة في هذا التقرير: الجغرافيا، الموسمية، أداء البائعين، وشدة التأخير.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">3 · هندسة الميزات</span>
+        <span class="s-body">المسافة haversine، تاريخ البائع المحسوب زمنيًا، مؤشرات الموسمية، ونسبة الشحن إلى السعر.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">4 · النمذجة</span>
+        <span class="s-body">تجاوز خط الأساس 0.679 / 0.791 — الهدف الواقعي هو تحسين PR-AUC لا ROC-AUC.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">5 · تتبع التجارب</span>
+        <span class="s-body">MLflow لمقارنة السيناريوهين أ و ب وتوثيق أثر كل ميزة.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">6 · النشر</span>
+        <span class="s-body">FastAPI داخل نفس منظومة Docker Compose الحالية — الحاوية جاهزة.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">7 · التنظيم</span>
+        <span class="s-body">Airflow أو Prefect لتحديث إحصاءات البائعين وإعادة بناء الميزات دوريًا.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">8 · المراقبة</span>
+        <span class="s-body">كشف الانحراف — والمبرر موثق فعليًا: 9.16% ← 6.02% بين فترتي التدريب والاختبار.</span>
+      </div>
+      <div class="stage">
+        <span class="s-title">9 · CI/CD وإعادة التدريب الآلي</span>
+        <span class="s-body">تُبنى على نتيجة المراقبة أعلاه، لا كإضافة شكلية.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9 ===================== -->
+  <section>
+    <h2><span class="num">09</span> أسئلة مفتوحة للمناقشة</h2>
+
+    <ol class="qlist">
+      <li>
+        <p><strong>هل الهدف هو التأخير مقابل الوعد، أم مقابل معيار موضوعي؟</strong></p>
+        <p>الأول قابل للتلاعب بتعديل الوعد وحده. أيهما يريد التدريب؟</p>
+      </li>
+      <li>
+        <p><strong>ما تكلفة كل نوع من الخطأ؟</strong></p>
+        <p>إنذار كاذب يكلّف وقت موظف؛ تفويت تأخير حقيقي يكلّف تقييمًا بنجمة واحدة. النسبة بينهما هي ما يحدد حد القرار — وليس القيمة الافتراضية 0.5.</p>
+      </li>
+      <li>
+        <p><strong>نموذج واحد أم اثنان؟</strong></p>
+        <p>أوصي باثنين للأسباب المذكورة في القسم 04؛ النموذج الواحد إما يسرّب أو يهدر معلومة قيّمة.</p>
+      </li>
+      <li>
+        <p><strong>لماذا الطلبات متعددة البائعين أفضل أداءً؟</strong></p>
+        <p>يحتاج تحققًا قبل أي استنتاج — قد يكون أثر انتقاء جغرافي بحت.</p>
+      </li>
+      <li>
+        <p><strong>مارس 2018 عند 21.4%: حدث لوجستي استثنائي أم مشكلة في البيانات؟</strong></p>
+        <p>يجب حسمه قبل بناء أي ميزة موسمية.</p>
+      </li>
+      <li>
+        <p><strong>هل نستبدل التصنيف بالانحدار؟</strong></p>
+        <p>الفكرة رقم 2 ذات عائد تجاري أعلى، وقد تكون الخيار الأذكى للتراك بأكمله.</p>
+      </li>
+    </ol>
+  </section>
+
+  <footer class="doc-foot">
+    <div>Olist Brazilian E-Commerce · PostgreSQL 16 · localhost:5433 · 9 tables · 1,550,922 rows</div>
+    <div>schema.sql · ingest.py · test_queries.sql · olist_explore.ipynb · baseline_model.py</div>
+    <div>كل الأرقام مستخرجة من قاعدة البيانات المحلية · 2026-08-08</div>
+  </footer>
+
+</div>
+</div>
