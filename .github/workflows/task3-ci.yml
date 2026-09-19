@@ -43,10 +43,25 @@ jobs:
       - run: pip install -r requirements/dev.txt
       - run: pytest tests/ -v --tb=short
 
+  # Build on every run; push to GitHub Container Registry only from main, and only
+  # after lint and tests passed (this job `needs: test`, which `needs: lint`).
+  # GITHUB_TOKEN is enough — no extra account or secret.
   build:
-    name: Docker build
+    name: Docker build & push
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t olist-late-predictor:${{ github.sha }} .
+      - name: Image name (GHCR needs a lower-case owner)
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/olist-late-predictor" >> "$GITHUB_ENV"
+      - name: Build
+        run: docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" .
+      - name: Push to ghcr.io
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"

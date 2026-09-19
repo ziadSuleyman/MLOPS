@@ -4,6 +4,10 @@
 # Python 3.13: the version the Task 2 model was trained under (see requirements/base.txt)
 FROM python:3.13-slim AS base
 
+# Links the image pushed to ghcr.io (by CI) to its source repository
+LABEL org.opencontainers.image.source="https://github.com/ziadSuleyman/MLOPS" \
+      org.opencontainers.image.description="Olist late-delivery inference API (MLOps Task 3)"
+
 # Prevent Python from writing .pyc and buffering stdout
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
