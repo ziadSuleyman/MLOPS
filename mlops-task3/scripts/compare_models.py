@@ -20,7 +20,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.artifacts import load_pickle, model_version  # noqa: E402
 from src.config import model as model_cfg  # noqa: E402
-from src.config import project_name, project_version  # noqa: E402
+from src.config import project_version  # noqa: E402
 
 
 def local_info() -> dict:
@@ -43,7 +43,7 @@ def local_info() -> dict:
 
 
 def mlflow_info() -> dict | None:
-    """Try to get the latest registered model version from MLflow."""
+    """The version the service would load: behind the production alias (else the latest)."""
     try:
         import mlflow  # noqa: E402
 
@@ -51,18 +51,26 @@ def mlflow_info() -> dict | None:
         mlflow.set_tracking_uri(tracking_uri)
         client = mlflow.tracking.MlflowClient()
 
-        versions = client.search_model_versions(f"name='{project_name}'")
+        name = model_cfg.registry_name
+        versions = client.search_model_versions(f"name='{name}'")
         if not versions:
             return None
 
-        latest = max(versions, key=lambda v: int(v.version))
-        run = client.get_run(latest.run_id)
+        try:
+            chosen = client.get_model_version_by_alias(name, model_cfg.registry_alias)
+            pointer = f"alias '{model_cfg.registry_alias}'"
+        except Exception:
+            chosen = max(versions, key=lambda v: int(v.version))
+            pointer = "latest (no alias set)"
+        run = client.get_run(chosen.run_id)
 
         return {
             "source": "mlflow",
-            "version": latest.version,
-            "model_version": latest.tags.get("model_version", "untagged"),
-            "run_id": latest.run_id,
+            "version": chosen.version,
+            "selected_by": pointer,
+            "stage": chosen.current_stage,
+            "model_version": chosen.tags.get("model_version", "untagged"),
+            "run_id": chosen.run_id,
             "metrics": run.data.metrics,
             "params": run.data.params,
             "tags": {k: v for k, v in run.data.tags.items() if not k.startswith("mlflow.")},
@@ -90,13 +98,15 @@ def main() -> None:
         print(f"\n[mlflow] Could not connect - {mlf['error']}")
         print("   -> Make sure MLflow is running: docker compose up mlflow")
     else:
-        print(f"\n[mlflow] Latest version {mlf['version']} (run {mlf['run_id'][:8]}):")
+        print(
+            f"\n[mlflow] Version {mlf['version']}, {mlf['selected_by']} (run {mlf['run_id'][:8]}):"
+        )
         for k, v in mlf.items():
             if k not in ("source", "run_id"):
                 print(f"   {k:20s}: {v}")
         same = mlf["model_version"] == loc["model_version"]
         verdict = "MATCH" if same else "DIFFER FROM"
-        print(f"\n   Local artifacts {verdict} the latest registered version.")
+        print(f"\n   Local artifacts {verdict} the version the service would load.")
 
     print()
 

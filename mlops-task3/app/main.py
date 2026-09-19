@@ -44,15 +44,17 @@ from src.monitoring import drift_snapshot, record_error
 from src.pipeline import OrderValidationError, run_batch_inference, run_inference
 from src.predict import get_model_info, load_model
 from src.reference import load_reference
+from src.registry import current_source, select_model_source
 from src.validation import check_no_leakage
 
 
 # ── Startup / shutdown ──────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load and check every artifact once at startup."""
+    """Pick the artifact source, then load and check every artifact once at startup."""
     log.info("Starting %s v%s", api_cfg.title, project_version)
     try:
+        select_model_source()  # MLflow registry (production alias), or models/ as fallback
         load_transformers()
         load_model()
         load_reference()
@@ -121,6 +123,7 @@ def health():
             model_loaded=True,
             model_version=model_version(),
             service_version=project_version,
+            model_source=current_source()["detail"],
         )
     except Exception:
         return HealthOutput(
@@ -128,6 +131,7 @@ def health():
             model_loaded=False,
             model_version="unknown",
             service_version=project_version,
+            model_source=current_source()["detail"],
         )
 
 

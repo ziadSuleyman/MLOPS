@@ -24,6 +24,7 @@ from src.config import model as model_cfg
 from src.config import project_version
 from src.logger import log
 from src.reference import calibrate, load_reference, risk_percentile
+from src.registry import current_source
 
 # ── Module-level cache ───────────────────────────────────────────────────────
 _model_bundle: dict[str, Any] | None = None
@@ -133,6 +134,7 @@ def get_model_info() -> dict:
         "requires_scaling": bundle["requires_scaling"],
         "metrics": bundle.get("metrics", {}),
         "artifacts_md5": artifact_manifest(),
+        "model_source": current_source(),
         "calibration": {
             "method": ref["calibration"]["method"],
             "fitted_on": ref["built_on"]["split"],

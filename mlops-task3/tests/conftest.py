@@ -24,6 +24,9 @@ if str(PROJECT_ROOT) not in sys.path:
 TEST_LOG_DIR = Path(tempfile.mkdtemp(prefix="olist-tests-"))
 os.environ["PREDICTION_LOG_FILE"] = str(TEST_LOG_DIR / "predictions.jsonl")
 os.environ["SERVICE_LOG_FILE"] = str(TEST_LOG_DIR / "service.log")
+# Tests read the artifacts from models/, whether or not an MLflow server happens to run;
+# tests/test_registry.py exercises the registry path against a throw-away store.
+os.environ["MODEL_SOURCE"] = "local"
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 SAMPLE_ORDER_ID = "8a9be36ffd78382f9ac518945e909636"

@@ -48,7 +48,17 @@ class _DB:
         )
 
 
+MODEL_SOURCE_OPTIONS = ("registry", "local")
+
+
 class _Model:
+    source: str = os.getenv("MODEL_SOURCE", _cfg["model"]["source"])
+    registry_name: str = _cfg["model"]["registry_name"]
+    registry_alias: str = _cfg["model"]["registry_alias"]
+    registry_stage: str = _cfg["model"]["registry_stage"]
+    registry_fallback_to_local: bool = _cfg["model"]["registry_fallback_to_local"]
+    # The artifact paths point at models/ until src/registry.py swaps in a registry download
+    local_dir: Path = PROJECT_ROOT / "models"
     artifact_path: Path = PROJECT_ROOT / _cfg["model"]["artifact_path"]
     transformers_path: Path = PROJECT_ROOT / _cfg["model"]["transformers_path"]
     feature_list_path: Path = PROJECT_ROOT / _cfg["model"]["feature_list_path"]
@@ -117,6 +127,11 @@ if _Inference.refit:
     raise ValueError(
         "inference.refit is true in config/settings.yaml — this service only applies "
         "the objects fitted in Task 2 and never refits. Set it to false."
+    )
+if _Model.source not in MODEL_SOURCE_OPTIONS:
+    raise ValueError(
+        f"model.source (or MODEL_SOURCE) must be one of {MODEL_SOURCE_OPTIONS}, "
+        f"got '{_Model.source}'"
     )
 if _Validation.on_failure not in ON_FAILURE_OPTIONS:
     raise ValueError(

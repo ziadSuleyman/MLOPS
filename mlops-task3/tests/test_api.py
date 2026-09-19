@@ -25,6 +25,7 @@ class TestHealthEndpoint:
         assert data["model_loaded"] is True
         assert re.fullmatch(r"[0-9a-f]{12}", data["model_version"])
         assert data["service_version"]
+        assert data["model_source"].startswith("models/")  # tests pin MODEL_SOURCE=local
 
 
 class TestModelInfoEndpoint:

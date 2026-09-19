@@ -108,6 +108,9 @@ class HealthOutput(BaseModel):
     model_loaded: bool
     model_version: str
     service_version: str
+    model_source: str = Field(
+        ..., examples=["olist-late-predictor@production (version 2, run 5c1e…)"]
+    )
 
 
 class ModelInfoOutput(BaseModel):
@@ -123,6 +126,7 @@ class ModelInfoOutput(BaseModel):
     requires_scaling: bool
     metrics: dict
     artifacts_md5: dict[str, str]
+    model_source: dict
     calibration: dict
     alerting: dict
 

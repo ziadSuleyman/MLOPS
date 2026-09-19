@@ -1,8 +1,10 @@
 # ── MLOps Task 3 — Full stack ──
-# docker compose up  → brings up everything on a clean machine.
+# docker compose up --build  → brings up everything on a clean machine:
+#   db + mlflow → register (one-off: puts the model in the registry if it is not there)
+#   → api (loads the model from the registry, alias "production")
 
 services:
-  # ── Olist database (same as Task 1) ──
+  # ── Olist database (same schema as Task 1) ──
   db:
     image: postgres:16
     environment:
@@ -18,12 +20,12 @@ services:
       interval: 5s
       retries: 5
 
-  # ── MLflow tracking server ──
+  # ── MLflow tracking server + model registry + artifact store ──
   mlflow:
     # Same version as the mlflow client in requirements/base.txt
     image: ghcr.io/mlflow/mlflow:v3.16.1
     # --allowed-hosts: MLflow 3 rejects Host headers it does not know (DNS-rebinding
-    #   guard) — the api container calls it as "mlflow:5000".
+    #   guard) — the other containers call it as "mlflow:5000".
     # --artifacts-destination: artifacts are uploaded THROUGH the server, so clients in
     #   other containers never need the server's filesystem.
     command: >
@@ -37,6 +39,25 @@ services:
       - "5000:5000"
     volumes:
       - mlflow_data:/mlflow
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 5s
+      retries: 30
+
+  # ── One-off: register the DVC-tracked artifacts baked into the image ──
+  # --if-missing: a version holding these exact files is reused (alias re-pointed),
+  # so running `docker compose up` again does not pile up versions.
+  register:
+    build: .
+    command: ["python", "scripts/register_model.py", "--if-missing"]
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MODEL_SOURCE: local   # it registers the local files, it does not read the registry
+      GIT_PYTHON_REFRESH: quiet
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    restart: "no"
 
   # ── Inference API ──
   api:
@@ -50,6 +71,7 @@ services:
       DB_USER: ${DB_USER:-olist}
       DB_PASSWORD: ${DB_PASSWORD:-olist123}
       MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MODEL_SOURCE: registry
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       # No git inside the image; stop mlflow's GitPython from warning about it
       GIT_PYTHON_REFRESH: quiet
@@ -57,7 +79,9 @@ services:
       db:
         condition: service_healthy
       mlflow:
-        condition: service_started
+        condition: service_healthy
+      register:
+        condition: service_completed_successfully
     volumes:
       - ./logs:/app/logs
 

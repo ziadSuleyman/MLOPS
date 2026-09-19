@@ -6,10 +6,22 @@
 
 project:
   name: olist-late-predictor
-  version: "1.1.0"
+  version: "1.2.0"
   description: "Predict whether an Olist order will be delivered late"
 
 model:
+  # Where the service takes its artifacts from (overridden by MODEL_SOURCE):
+  #   registry — MLflow: the version behind registry_alias, downloaded and md5-checked at
+  #              startup. Falls back to the local files below if MLflow is not configured
+  #              (no MLFLOW_TRACKING_URI) or not reachable — never if it serves other bytes.
+  #   local    — the files below (DVC-tracked, baked into the image)
+  source: "registry"
+  registry_name: "olist-late-predictor"
+  registry_alias: "production"
+  # MLflow deprecated stages in 2.9 in favour of aliases; the stage is still set so the
+  # registry reads "Production" for anyone who looks for it. The service uses the alias.
+  registry_stage: "Production"
+  registry_fallback_to_local: true
   artifact_path: "models/06_model.joblib"
   transformers_path: "models/05_transformers.joblib"
   feature_list_path: "models/05_feature_list.json"

@@ -62,13 +62,21 @@ def model_version() -> str:
     return _version
 
 
-def dvc_mismatches() -> list[str]:
-    """Artifacts whose content differs from the md5 in their .dvc pointer file."""
+def dvc_mismatches(include_missing: bool = True) -> list[str]:
+    """
+    Artifacts whose content differs from the md5 in their .dvc pointer file
+    (and, with include_missing, artifacts that have no pointer at all).
+
+    The pointers always come from models/ — also when the files themselves were
+    downloaded from the registry — so a registry version is checked against the
+    bytes DVC recorded.
+    """
     problems = []
     for name, path in serving_artifacts().items():
-        pointer = path.with_name(path.name + ".dvc")
+        pointer = model_cfg.local_dir / (path.name + ".dvc")
         if not pointer.exists():
-            problems.append(f"{name}: no DVC pointer file ({pointer.name})")
+            if include_missing:
+                problems.append(f"{name}: no DVC pointer file ({pointer.name})")
             continue
         with open(pointer, encoding="utf-8") as f:
             recorded = yaml.safe_load(f)["outs"][0]["md5"]
