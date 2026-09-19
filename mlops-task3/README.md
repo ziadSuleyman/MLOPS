@@ -59,13 +59,16 @@ in Task 2 — and it reproduces the notebooks exactly (ROC-AUC 0.7107 on the tes
                      └──────────────┘     └──────────────────────┘
 ```
 
-**Three containers** via Docker Compose:
+**Three containers and one start-up step** via Docker Compose:
 
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
 | `db` | postgres:16 | 5433 | Olist database (same schema as Task 1) |
-| `mlflow` | ghcr.io/mlflow/mlflow:v3.16.1 | 5000 | Experiment tracking & model registry |
-| `api` | Built from `Dockerfile` (python:3.13-slim) | 8000 | Inference API |
+| `mlflow` | ghcr.io/mlflow/mlflow:v3.16.1 | 5000 | Experiment tracking, model registry, artifact store |
+| `register` | Built from `Dockerfile` | — | One-off: registers the model if the registry does not hold it yet, then exits |
+| `api` | Built from `Dockerfile` (python:3.13-slim) | 8000 | Inference API — loads the model **from the registry** |
+
+Start-up order: `db` + `mlflow` healthy → `register` finished → `api`.
 
 ---
 
@@ -79,7 +82,7 @@ cd MLOPS/mlops-task3
 # 2. Copy the env file and edit if needed
 cp .env.example .env
 
-# 3. Start everything (DB + MLflow + API)
+# 3. Start everything (DB + MLflow + model registration + API)
 docker compose up --build
 
 # 4. Test the API
@@ -88,6 +91,10 @@ curl http://localhost:8000/docs
 ```
 
 The API is live at `http://localhost:8000`. Interactive docs at `/docs`.
+`/health` should report `"model_source": "olist-late-predictor@production (version N, …)"`.
+
+Port 8000 taken by something else? Pick another host port: `API_PORT=8010 docker compose up --build`.
+Always keep `--build`: without it Compose reuses an old image.
 
 ---
 
@@ -131,13 +138,15 @@ Health check — is the service up and the model loaded?
   "status": "healthy",
   "model_loaded": true,
   "model_version": "f9fcc48ef9ef",
-  "service_version": "1.1.0"
+  "service_version": "1.2.0",
+  "model_source": "olist-late-predictor@production (version 2, run e90dde2c919c4cf18383b421f76b368c)"
 }
 ```
 
 `model_version` is not typed by hand: it is a hash of the four serving artifacts
 (model, transformers, feature list, serving reference). Replace any of them and
-it changes by itself.
+it changes by itself. `model_source` says where they were loaded from — the MLflow
+registry, or `models/` when the registry was not reachable.
 
 ### `GET /model/info`
 
@@ -149,7 +158,8 @@ every artifact (the same md5 DVC records), the calibration and the alert policy.
 {
   "model_type": "LogisticRegression",
   "model_version": "f9fcc48ef9ef",
-  "service_version": "1.1.0",
+  "service_version": "1.2.0",
+  "model_source": {"source": "registry", "detail": "olist-late-predictor@production (version 2, …)", "registry_version": "2"},
   "n_features": 31,
   "hyperparameters": {"C": 0.3, "class_weight": "balanced", "max_iter": 3000},
   "label_definition": "calendar-day rule",
@@ -297,12 +307,13 @@ mlops-task3/
 │   ├── predict.py              #   model loading, score → probability → decision
 │   ├── pipeline.py             #   end-to-end: validate → features → predict → record
 │   ├── monitoring.py           #   Prometheus, PSI drift, JSONL prediction log
+│   ├── registry.py             #   register the bundle in MLflow; load it back (alias production)
 │   └── evaluation.py           #   score logged predictions against real deliveries
 │
 ├── config/
 │   └── settings.yaml           # All configuration — no hardcoded values
 │
-├── models/                     # Serving artifacts (DVC-tracked)
+├── models/                     # Serving artifacts (DVC-tracked; registered in MLflow)
 │   ├── 05_transformers.joblib  #   target encoders, OHE, imputer, scaler  (Task 2)
 │   ├── 05_feature_list.json    #   31-feature contract + metadata          (Task 2)
 │   ├── 06_model.joblib         #   LogisticRegression(C=0.3, balanced)     (Task 2)
@@ -312,16 +323,16 @@ mlops-task3/
 ├── scripts/                    # Operations & maintenance scripts
 │   ├── build_serving_reference.py  # fit calibration on validation → 07_serving_reference.json
 │   ├── make_parity_fixture.py  #   real test orders + notebook features → tests/fixtures
-│   ├── register_model.py       #   register model in MLflow (tagged with the artifact hash)
+│   ├── register_model.py       #   register the serving bundle in MLflow (alias + stage + md5 tags)
 │   ├── compare_models.py       #   compare local artifacts vs MLflow registry
 │   ├── analyze_predictions.py  #   prediction log: alert ratio, latency, PSI drift
 │   └── evaluate_outcomes.py    #   prediction log + orders table → real-world accuracy
 │
-├── tests/                      # pytest suite (164 tests)
+├── tests/                      # pytest suite (173 tests)
 │   ├── conftest.py             #   shared fixtures (a real order, temp logs)
 │   ├── helpers.py              #   small shared helpers
 │   ├── fixtures/parity_orders.parquet  # 314 real test orders + notebook features
-│   └── test_*.py               #   13 modules, see Testing
+│   └── test_*.py               #   14 modules, see Testing
 │
 ├── notebooks/                  # Reference notebooks from Task 2 (read-only)
 ├── logs/                       # Runtime logs (gitignored)
@@ -624,37 +635,53 @@ The artifacts are small (under 10 KB each), so they are **also** committed to gi
 
 ## MLflow — Model Registry
 
-Register the model in MLflow for versioning and lineage:
+The service **loads its model from the registry**. `docker compose up` does the whole
+round trip: the one-off `register` step puts the model in MLflow (only if the registry
+does not already hold these exact files), then the API downloads it back.
+
+**Registration** (`scripts/register_model.py` → `src/registry.register_bundle`):
+- one run in the experiment `olist-late-predictor`
+- **Params**: C, class_weight, max_iter, n_features, requires_scaling, label definition
+- **Metrics**: ROC-AUC, PR-AUC, recall/precision at 5%, lift — validation and test
+- **Artifacts**: `serving/` = the four files the service loads, plus a manifest of their md5s
+- **Registered model** `olist-late-predictor`: the sklearn model with its signature
+- the new version gets the alias **`production`** and the stage **`Production`**
+  (MLflow deprecated stages in 2.9 in favour of aliases; both are set, the service reads the alias)
+- tags on the version: `model_version` (the hash `/health` reports) and each file's md5
+
+**Loading** (`model.source: registry`, at API start-up):
+1. look up `olist-late-predictor@production`
+2. download that version's `serving/` files
+3. check each md5 against the version's tags **and** against the DVC pointers in `models/`
+4. only then load them
+
+| Situation | What the API does |
+|-----------|-------------------|
+| Registry reachable, files check out | serves the registry version (`model_source` says which) |
+| `MLFLOW_TRACKING_URI` not set, or MLflow down | serves `models/` (the same DVC-tracked bytes) and logs why |
+| Registry serves different bytes than recorded | **refuses to start** |
 
 ```bash
-# Start MLflow server
+# By hand (outside compose)
 docker compose up mlflow -d
-
-# Register the model
-python scripts/register_model.py
-python scripts/register_model.py --run-name "v1.1.0"
-
-# Compare local vs registered
-python scripts/compare_models.py
+python scripts/register_model.py --if-missing   # reuse a version with these exact files
+python scripts/register_model.py                # always a new version
+python scripts/compare_models.py                # local files vs the version behind "production"
 ```
 
-What gets logged:
-- **Params**: C, class_weight, n_features, requires_scaling
-- **Metrics**: ROC-AUC, PR-AUC, recall@5%, precision@5%, lift (validation + test)
-- **Tags**: `model_version` (the artifact hash reported by `/health`) and the md5 of each artifact
-- **Artifacts**: model, transformers, feature list, serving reference
-- **Model Registry**: sklearn model with input/output signature, tagged with `model_version`
+To promote another version, point the alias at it (MLflow UI → model → version → aliases)
+and restart the API.
 
-`compare_models.py` says whether the local artifacts match the latest registered version.
-
-MLflow UI: `http://localhost:5000`
+MLflow UI: `http://localhost:5000` — Models → `olist-late-predictor`.
 
 ---
 
 ## Testing
 
-164 tests across 13 modules. Tests write to a temporary log directory — never to
-`logs/predictions.jsonl`.
+173 tests across 14 modules. Tests write to a temporary log directory — never to
+`logs/predictions.jsonl` — and read the artifacts from `models/` (`MODEL_SOURCE=local`);
+`test_registry.py` exercises the registry against a throw-away MLflow store. It needs
+MLflow (in `requirements/base.txt`); where MLflow is missing those 5 tests are skipped.
 
 ```bash
 # Run all tests
@@ -682,6 +709,7 @@ pytest --cov=src --cov=app --cov-report=term-missing
 | `test_evaluation.py` | 9 | calendar-day label, join by order_id, metrics |
 | `test_artifacts.py` | 8 | model version hash, DVC pointers, sklearn version guard |
 | `test_api.py` | 17 | all endpoints, 422s (incl. Infinity), batch limit from config |
+| `test_registry.py` | 9 | register (alias, stage, tags), re-register, download + md5 check, tampering refused, same prediction from the registry, fallback |
 
 `tests/fixtures/parity_orders.parquet` holds 314 real test-split orders (a random
 sample plus the awkward cases: missing coordinates, missing category, east-coast
@@ -699,7 +727,14 @@ push to main/develop
     ├── lint     → ruff check + ruff format --check
     ├── test     → pip install + pytest (depends on lint)
     └── build    → docker build (depends on test)
+                   + push to ghcr.io/ziadsuleyman/olist-late-predictor:<sha> and :latest
+                     (main only — so only an image whose lint and tests passed is published)
 ```
+
+The push uses the workflow's own `GITHUB_TOKEN` (`packages: write`), no extra secret.
+The package appears under the GitHub profile → Packages; it is private until its
+visibility is changed there. Pull it with
+`docker pull ghcr.io/ziadsuleyman/olist-late-predictor:latest`.
 
 Pre-commit hooks (`.pre-commit-config.yaml`):
 - Trailing whitespace, end-of-file fixer, YAML/JSON check
@@ -720,7 +755,7 @@ All runtime configuration in one file. Invalid values stop the service at startu
 | Section | Key settings |
 |---------|-------------|
 | `project` | name, version, description |
-| `model` | artifact paths (incl. the serving reference), target, label definition |
+| `model` | source (registry/local), registry name, alias `production`, stage, fallback; artifact paths; label definition |
 | `inference` | refit: false (true is refused), batch_max_size: 500 |
 | `alerting` | budget: 0.05, window: 1000, min_window: 200 |
 | `api` | title, docs_url, health_path |
@@ -741,6 +776,7 @@ All runtime configuration in one file. Invalid values stop the service at startu
 | `API_HOST` | 0.0.0.0 | API bind address |
 | `API_PORT` | 8000 | API port |
 | `LOG_LEVEL` | INFO | Logging level |
+| `MODEL_SOURCE` | registry | `registry` or `local` (overrides `model.source`) |
 | `PREDICTION_LOG_FILE` | logs/predictions.jsonl | Prediction log location |
 | `SERVICE_LOG_FILE` | logs/service.log | Service log location |
 
@@ -752,7 +788,7 @@ All runtime configuration in one file. Invalid values stop the service at startu
 |--------|---------|-------|
 | `scripts/build_serving_reference.py` | Fit calibration on validation, store score percentiles | `python scripts/build_serving_reference.py` |
 | `scripts/make_parity_fixture.py` | Real test orders + notebook features for the parity tests | `python scripts/make_parity_fixture.py` |
-| `scripts/register_model.py` | Register model + artifacts in MLflow | `python scripts/register_model.py` |
+| `scripts/register_model.py` | Register the serving bundle in MLflow, alias `production` | `python scripts/register_model.py --if-missing` |
 | `scripts/compare_models.py` | Compare local artifacts vs MLflow registry | `python scripts/compare_models.py` |
 | `scripts/analyze_predictions.py` | Prediction log: alert ratio, latency, PSI drift | `python scripts/analyze_predictions.py --all` |
 | `scripts/evaluate_outcomes.py` | Score logged predictions against real deliveries | `python scripts/evaluate_outcomes.py --all` |
@@ -792,6 +828,11 @@ The first two read Task 2's artifacts (`../mlops-task2/artifacts` by default).
 9. **The version is the content.** `model_version` is a hash of the artifacts; the
    same hash is tagged in MLflow, and each file's md5 matches its DVC pointer.
 
-10. **Chronological splits.** Train < 2018-04, val Apr–May 2018, test Jun+ 2018.
+10. **Loaded from the registry, checked against DVC.** The API serves the version
+    behind the `production` alias, and only after its bytes match both the registry's
+    records and the DVC pointers. An unreachable registry degrades to the same bytes
+    from `models/`; a registry that serves other bytes stops the service.
+
+11. **Chronological splits.** Train < 2018-04, val Apr–May 2018, test Jun+ 2018.
     No random splitting — the model is evaluated on data from the future
     relative to training, as it would be in production.

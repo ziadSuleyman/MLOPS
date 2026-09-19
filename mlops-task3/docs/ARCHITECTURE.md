@@ -8,6 +8,12 @@ pipeline and are loaded at startup as immutable artifacts. One more artifact is
 built offline in Task 3 — the serving reference (calibration + the validation
 score distribution) — and is equally read-only at serving time.
 
+At startup the service takes all four from the **MLflow registry** (the version behind
+the alias `production`), checks their md5s against the version's tags and the DVC
+pointers, and only then loads them. If MLflow is not configured or not reachable it
+loads the same DVC-tracked files from `models/`; if MLflow serves different bytes it
+refuses to start (`src/registry.py`).
+
 ## Component Map
 
 ```
@@ -61,6 +67,7 @@ score distribution) — and is equally read-only at serving time.
 | `src/pipeline.py` | Orchestrate: validate → features → predict → record | All above |
 | `src/monitoring.py` | Prometheus, PSI drift window, JSONL prediction log | None |
 | `src/evaluation.py` | Score logged predictions against real deliveries | None |
+| `src/registry.py` | Register the bundle in MLflow; pick and verify the source at startup | All four |
 | `app/main.py` | FastAPI routes, startup checks, error handling | None |
 | `app/schemas.py` | Pydantic request/response models | None |
 
@@ -136,7 +143,8 @@ Plain JSON, built from the **validation** split:
 | Unexpected error | 500 | `internal` | Out of memory |
 
 Startup fails (the service does not come up) on: `inference.refit: true`, an unknown
-`on_failure` value, a scikit-learn version mismatch, a serving reference built for
+`on_failure` or `model.source` value, registry files whose md5 differs from what was
+recorded for that version, a scikit-learn version mismatch, a serving reference built for
 another model, or a leakage column in the feature contract.
 
 ## Configuration Hierarchy

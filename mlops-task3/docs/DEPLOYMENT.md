@@ -12,8 +12,9 @@
 # Start all services
 docker compose up --build -d
 
-# Check logs
+# Check logs (the API says where its model came from: "Model source: ...")
 docker compose logs -f api
+docker compose logs register
 
 # Stop
 docker compose down
@@ -24,7 +25,7 @@ Services:
 | Service | URL | Notes |
 |---------|-----|-------|
 | API | http://localhost:8000 | Swagger at /docs |
-| MLflow | http://localhost:5000 | Experiment tracking (v3.16.1, same as the client) |
+| MLflow | http://localhost:5000 | Tracking + registry (v3.16.1, same as the client) |
 | PostgreSQL | localhost:5433 | Olist database |
 
 ## Option 2: Local Development
@@ -50,7 +51,7 @@ uvicorn app.main:app --reload --port 8000
 ### Build the Docker image
 
 ```bash
-docker build -t olist-predictor:1.1.0 .
+docker build -t olist-predictor:1.2.0 .
 ```
 
 ### Run standalone
@@ -66,8 +67,11 @@ docker run -d \
   -e DB_PASSWORD=secure-password \
   -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
   -v $(pwd)/logs:/app/logs \
-  olist-predictor:1.1.0
+  olist-predictor:1.2.0
 ```
+
+A standalone container has no registry unless you pass `MLFLOW_TRACKING_URI`; it then
+serves the DVC-tracked files baked into the image (`/health` → `model_source`).
 
 Run **one** worker per container: the alert window and the drift window live in
 process memory, so several workers would each keep their own.
@@ -76,12 +80,14 @@ process memory, so several workers would each keep their own.
 
 ```bash
 curl http://localhost:8000/health
-# {"status":"healthy","model_loaded":true,"model_version":"f9fcc48ef9ef","service_version":"1.1.0"}
+# {"status":"healthy","model_loaded":true,"model_version":"f9fcc48ef9ef","service_version":"1.2.0",
+#  "model_source":"olist-late-predictor@production (version 2, run ...)"}
 ```
 
 ## Post-Deployment Checklist
 
-- [ ] Verify `/health` returns `healthy`, and its `model_version` matches the MLflow tag
+- [ ] Verify `/health` returns `healthy`, `model_source` names the registry version, and
+      `model_version` matches that version's tag (`python scripts/compare_models.py`)
 - [ ] Check the startup log has no `DVC:` warnings (artifacts = DVC-recorded versions)
 - [ ] Send a test prediction to `/predict` (the README example is a real order)
 - [ ] Check `/metrics` endpoint is accessible
@@ -102,6 +108,8 @@ curl http://localhost:8000/health
 4. Track with DVC and push: `python -m dvc add models/*.joblib models/*.json` then `python -m dvc push`
 5. Bump `project.version` in `config/settings.yaml` if the API changed
    (`model_version` changes by itself — it is the artifacts' hash)
-6. Register in MLflow: `python scripts/register_model.py --run-name "v1.2.0"`
-7. Rebuild the Docker image: `docker compose up --build -d`
+6. Register in MLflow: `python scripts/register_model.py` — the new version becomes
+   `production` (or let `docker compose up --build` do it: its `register` step runs
+   `--if-missing`)
+7. Rebuild and restart: `docker compose up --build -d` — the API loads the new version
 8. Verify with `/health` and `/model/info`
