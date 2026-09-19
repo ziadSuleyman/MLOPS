@@ -1,0 +1,66 @@
+# ── MLOps Task 3 — Full stack ──
+# docker compose up  → brings up everything on a clean machine.
+
+services:
+  # ── Olist database (same as Task 1) ──
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-olist}
+      POSTGRES_USER: ${DB_USER:-olist}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-olist123}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-olist}"]
+      interval: 5s
+      retries: 5
+
+  # ── MLflow tracking server ──
+  mlflow:
+    # Same version as the mlflow client in requirements/base.txt
+    image: ghcr.io/mlflow/mlflow:v3.16.1
+    # --allowed-hosts: MLflow 3 rejects Host headers it does not know (DNS-rebinding
+    #   guard) — the api container calls it as "mlflow:5000".
+    # --artifacts-destination: artifacts are uploaded THROUGH the server, so clients in
+    #   other containers never need the server's filesystem.
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --allowed-hosts mlflow,mlflow:5000,localhost,localhost:5000,127.0.0.1,127.0.0.1:5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+
+  # ── Inference API ──
+  api:
+    build: .
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-olist}
+      DB_USER: ${DB_USER:-olist}
+      DB_PASSWORD: ${DB_PASSWORD:-olist123}
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # No git inside the image; stop mlflow's GitPython from warning about it
+      GIT_PYTHON_REFRESH: quiet
+    depends_on:
+      db:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  pgdata:
+  mlflow_data:

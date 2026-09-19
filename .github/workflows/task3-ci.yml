@@ -1,0 +1,52 @@
+# ── Task 3 CI — runs on every push that touches mlops-task3 ──
+# A failing test stops the pipeline. That is the whole point.
+#
+# GitHub only reads workflows from the repository root, so this file lives here
+# and every step runs inside mlops-task3/.
+
+name: Task 3 CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ["mlops-task3/**", ".github/workflows/task3-ci.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["mlops-task3/**", ".github/workflows/task3-ci.yml"]
+
+defaults:
+  run:
+    working-directory: mlops-task3
+
+jobs:
+  lint:
+    name: Lint & format check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install ruff==0.16.7
+      - run: ruff check .
+      - run: ruff format --check .
+
+  test:
+    name: Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements/dev.txt
+      - run: pytest tests/ -v --tb=short
+
+  build:
+    name: Docker build
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t olist-late-predictor:${{ github.sha }} .
