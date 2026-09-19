@@ -1,0 +1,23 @@
+[project]
+name = "olist-late-predictor"
+version = "1.1.0"
+description = "Predict whether an Olist order will be delivered late"
+# The model was trained under Python 3.13 / scikit-learn 1.9.0 — serve it under the same
+requires-python = ">=3.13"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+# Task 2's notebooks, copied byte-for-byte as a reference — not service code
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501"]   # line length handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

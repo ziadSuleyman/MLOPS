@@ -1,0 +1,5 @@
+[core]
+    no_scm = True
+    remote = localstore
+['remote "localstore"']
+    url = ../../../dvc-storage/mlops-task3

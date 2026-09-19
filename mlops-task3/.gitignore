@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment / secrets
+.env
+
+# Logs
+logs/*.log
+logs/*.jsonl
+
+# Model artifacts — normally DVC-only, but these are < 10 KB
+# so we track them in both git (for CI) and DVC (for lineage).
+# For larger models, uncomment the joblib/pkl lines and use `dvc pull` in CI.
+# models/*.joblib
+# models/*.pkl
+data/*.parquet
+data/*.csv
+!data/.gitkeep
+
+# The parity test fixture must be committed (the repo root ignores *.parquet):
+# 314 real test orders + Notebook 5 features, ~100 KB — CI runs test_parity.py on it
+!tests/fixtures/parity_orders.parquet
+
+# DVC cache
+.dvc/cache
+.dvc/tmp
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker
+*.tar

@@ -1,0 +1,23 @@
+# ── Development dependencies ──
+# Not installed in the production container.
+
+-r base.txt
+
+# Testing
+pytest==9.1.1
+pytest-cov==7.1.0
+httpx==0.28.1           # test client for FastAPI
+
+# Linting & formatting
+ruff==0.16.7
+
+# Pre-commit hooks
+pre-commit==4.2.0
+
+# Data versioning (the default remote is a local folder; add an extra such as
+# dvc[gdrive] or dvc[s3] when moving to a cloud remote)
+dvc==3.67.1
+
+# Notebooks (reference only — not in production)
+jupyterlab==4.6.2
+ipykernel==7.3.0

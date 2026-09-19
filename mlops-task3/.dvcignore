@@ -1,0 +1,9 @@
+# DVC ignore — same idea as .gitignore but for DVC
+__pycache__
+.venv
+.git
+.dvc/cache
+.dvc/tmp
+logs/
+mlruns/
+notebooks/

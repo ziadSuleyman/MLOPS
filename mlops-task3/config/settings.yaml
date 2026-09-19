@@ -1,0 +1,120 @@
+# ──────────────────────────────────────────────
+# MLOps Task 3 — Central configuration
+# No hardcoded values anywhere else in the code.
+# Secrets (passwords, keys) come from .env only.
+# ──────────────────────────────────────────────
+
+project:
+  name: olist-late-predictor
+  version: "1.1.0"
+  description: "Predict whether an Olist order will be delivered late"
+
+model:
+  artifact_path: "models/06_model.joblib"
+  transformers_path: "models/05_transformers.joblib"
+  feature_list_path: "models/05_feature_list.json"
+  # Calibration + validation score distribution, built by scripts/build_serving_reference.py
+  reference_path: "models/07_serving_reference.json"
+  target: "is_late"
+  label_definition: "calendar-day rule"
+
+inference:
+  # The pipeline loads fitted objects — never refits.
+  # The service refuses to start if this is set to true.
+  refit: false
+  batch_max_size: 500
+
+alerting:
+  # Notebook 6: carry the budget PERCENTAGE into production, not a numeric threshold —
+  # the late rate moves between periods (7.95% → 5.53% → 3.61%).
+  budget: 0.05        # share of orders flagged "late"
+  window: 1000        # recent scores used to place the threshold
+  min_window: 200     # below this, use the validation-split threshold instead
+
+api:
+  title: "Olist Late Delivery Predictor"
+  docs_url: "/docs"
+  health_path: "/health"
+
+logging:
+  level: "INFO"           # overridden by LOG_LEVEL env var
+  format: "[{asctime}] [{levelname}] [{name}] {message}"
+  file: "logs/service.log"        # overridden by SERVICE_LOG_FILE env var
+  max_bytes: 10485760     # 10 MB
+  backup_count: 5
+
+monitoring:
+  enable_prometheus: true
+  metrics_path: "/metrics"
+  prediction_log_file: "logs/predictions.jsonl"   # overridden by PREDICTION_LOG_FILE env var
+  # Drift = the score distribution moving away from the validation split's (PSI).
+  drift_window: 1000
+  drift_min_window: 200
+  psi_warn: 0.10
+  psi_alert: 0.25
+
+validation:
+  # Great Expectations suite name
+  suite_name: "order_input_suite"
+  # What to do when an order breaks a rule:
+  #   "reject" → HTTP 422 with the list of problems
+  #   "flag"   → predict anyway, attach the problems to the response and the log
+  # Problems that make a prediction impossible (missing or unreadable dates) always reject.
+  on_failure: "reject"
+  # Run the Great Expectations suite on batch requests (~1 s per batch)
+  ge_on_batch: true
+  # Allowed categories (from the training data)
+  allowed_states:
+    - AC
+    - AL
+    - AM
+    - AP
+    - BA
+    - CE
+    - DF
+    - ES
+    - GO
+    - MA
+    - MG
+    - MS
+    - MT
+    - PA
+    - PB
+    - PE
+    - PI
+    - PR
+    - RJ
+    - RN
+    - RO
+    - RR
+    - RS
+    - SC
+    - SE
+    - SP
+    - TO
+  allowed_payment_types:
+    - credit_card
+    - boleto
+    - debit_card
+    - voucher
+  # Plausible ranges checked statistically by Great Expectations on batches
+  # ("mostly" 95%) — a single unusual order is not an error.
+  numeric_ranges:
+    freight_total: [0, 500]
+    freight_max: [0, 500]
+    items_price_total: [0, 15000]
+    items_price_max: [0, 15000]
+    payment_total: [0, 15000]
+    installments_max: [0, 24]
+    n_payments: [1, 30]
+    n_items: [1, 50]
+    n_products: [1, 30]
+    n_sellers: [1, 20]
+    n_categories: [0, 20]
+    weight_g_total: [0, 50000]
+    photos_avg: [0, 20]
+  # Brazil's bounding box. The east edge is -28, not -35: Recife and João Pessoa sit
+  # east of -35, and 1,519 real orders (mostly PE and PB) have longitudes there.
+  coordinate_ranges:
+    lat: [-34, 6]
+    lng: [-74, -28]

@@ -1,0 +1,5 @@
+outs:
+- md5: 3e7e841f57893f37f0705fa3d0e9bb2e
+  size: 2842
+  hash: md5
+  path: 07_serving_reference.json

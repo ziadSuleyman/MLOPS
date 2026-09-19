@@ -1,0 +1,37 @@
+# ── Runtime dependencies ──
+# Pinned to the environment the model was trained and tested in (Python 3.13).
+# scikit-learn must stay 1.9.0: the Task 2 artifacts were pickled with it, and
+# src/artifacts.load_pickle refuses to load them under any other version.
+
+# API
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+pydantic==2.13.5
+pydantic-settings==2.15.0
+
+# Data
+pandas==3.0.5
+numpy==2.5.1
+pyarrow==25.0.1
+sqlalchemy==2.0.51
+psycopg[binary]==3.3.4
+
+# ML — the versions the Task 2 notebooks ran with
+scikit-learn==1.9.0
+scipy==1.18.0
+joblib==1.5.3
+
+# Config
+pyyaml==6.0.3
+python-dotenv==1.2.3
+
+# Experiment tracking (client must match the server image in docker-compose.yml)
+mlflow==3.16.1
+
+# Data validation
+great-expectations==1.23.0
+
+# Monitoring
+prometheus-client==0.26.0
+
+# Logging (stdlib — no extra package needed)
