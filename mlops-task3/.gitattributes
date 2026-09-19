@@ -1,0 +1,7 @@
+# The serving artifacts are identified by their md5 (DVC pointers, model_version).
+# Git must store them byte-for-byte: no line-ending conversion on any platform.
+# Without this, core.autocrlf turned the JSON artifacts' CRLF into LF on commit,
+# so every Linux checkout (CI, Docker, a clean machine) got different md5s.
+models/*.joblib -text
+models/*.json -text
+tests/fixtures/** -text
