@@ -1,4 +1,5 @@
 """Build Task3_Submission.pdf: embed figures as data URIs, then print with headless Chrome."""
+
 import base64
 import pathlib
 import re
@@ -17,7 +18,16 @@ def embed(match: re.Match) -> str:
 
 built = HERE / "_build.html"
 built.write_text(re.sub(r"\{\{FIG:(\w+)\}\}", embed, html), encoding="utf-8")
-subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-pdf-header-footer",
-                f"--print-to-pdf={HERE / 'Task3_Submission.pdf'}", built.as_uri()], check=True)
+subprocess.run(
+    [
+        CHROME,
+        "--headless=new",
+        "--disable-gpu",
+        "--no-pdf-header-footer",
+        f"--print-to-pdf={HERE / 'Task3_Submission.pdf'}",
+        built.as_uri(),
+    ],
+    check=True,
+)
 built.unlink()
 print("wrote", HERE / "Task3_Submission.pdf")
