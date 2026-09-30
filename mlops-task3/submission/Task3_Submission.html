@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MLOps Task 3 — Submission Report</title>
+<style>
+@page { size: A4; margin: 16mm 14mm 14mm 14mm; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.2pt; line-height: 1.55; color: #16202b; margin: 0; background: #fff;
+}
+h1, h2, h3 { color: #0f2740; line-height: 1.25; margin: 0 0 .4em; }
+h2 { font-size: 14.5pt; margin-top: 1.5em; padding-bottom: .28em; border-bottom: 2px solid #1f5fa9; break-after: avoid; }
+h3 { font-size: 11.4pt; margin-top: 1.25em; color: #1f5fa9; break-after: avoid; }
+p { margin: .5em 0; }
+ul, ol { margin: .5em 0; padding-inline-start: 1.35em; }
+li { margin: .22em 0; }
+code, kbd { font-family: Consolas, "Courier New", monospace; font-size: .92em;
+  background: #eef2f7; padding: .08em .32em; border-radius: 3px; color: #123; }
+pre {
+  font-family: Consolas, "Courier New", monospace; font-size: 8.3pt; line-height: 1.42;
+  background: #0f1b28; color: #dbe6f0; padding: 9px 11px; border-radius: 5px;
+  overflow: hidden; margin: .5em 0; white-space: pre-wrap; overflow-wrap: anywhere; direction: ltr; text-align: left;
+}
+pre b { color: #ffd479; font-weight: 600; }
+pre i { color: #8fa6bb; font-style: normal; }
+pre .bad { color: #ff8a80; font-weight: 600; }
+table { border-collapse: collapse; width: 100%; margin: .6em 0; font-size: 9.4pt; }
+th, td { border: 1px solid #ccd6e0; padding: 4.5px 8px; text-align: start; vertical-align: top; }
+th { background: #e8eef5; font-weight: 600; color: #0f2740; }
+td.num, th.num { text-align: end; font-variant-numeric: tabular-nums; }
+tbody tr:nth-child(even) td { background: #f7f9fb; }
+tr { break-inside: avoid; }
+
+.cover { text-align: center; padding-top: 44mm; }
+.cover .kicker { font-size: 10pt; letter-spacing: .18em; text-transform: uppercase;
+  color: #1f5fa9; font-weight: 600; }
+.cover h1 { font-size: 27pt; margin: .28em 0 .1em; letter-spacing: -.5px; }
+.cover .sub { font-size: 13pt; color: #4a5b6d; margin-bottom: 2.4em; }
+.cover .rule { width: 62px; height: 3px; background: #1f5fa9; margin: 1.4em auto 2em; }
+.meta { display: inline-block; text-align: start; border: 1px solid #ccd6e0;
+  border-radius: 6px; padding: 14px 22px; font-size: 10pt; }
+.meta div { margin: 3px 0; }
+.meta span { display: inline-block; min-width: 128px; color: #4a5b6d; }
+.cover .foot { margin-top: 2.6em; font-size: 9pt; color: #6b7c8d; }
+
+.evidence { border: 1px solid #ccd6e0; border-radius: 5px; margin: .7em 0; overflow: hidden; break-inside: avoid; }
+.evidence .cap { background: #e8eef5; padding: 4px 10px; font-size: 8.6pt;
+  font-weight: 600; color: #0f2740; letter-spacing: .02em; }
+.evidence pre { margin: 0; border-radius: 0; }
+.figure { margin: .8em 0; text-align: center; break-inside: avoid; }
+.figure img { max-width: 100%; border: 1px solid #ccd6e0; border-radius: 4px; }
+.figure .cap { font-size: 8.6pt; color: #5a6b7c; margin-top: 4px; }
+.ok { color: #17743f; font-weight: 700; }
+.warn { color: #9a6700; font-weight: 700; }
+.alert { color: #b3261e; font-weight: 700; }
+.pagebreak { break-after: page; }
+.avoid { break-inside: avoid; }
+svg { display: block; margin: .6em auto; max-width: 100%; }
+.small { font-size: 8.8pt; color: #5a6b7c; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.two .evidence { margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ======================= COVER ======================= -->
+<section class="cover pagebreak">
+  <div class="kicker">Qafza &middot; MLOps Training 2026/2027</div>
+  <h1>Task 3 — Submission Report</h1>
+  <div class="sub">From Notebooks to Production</div>
+  <div class="rule"></div>
+  <div class="meta">
+    <div><span>Student</span> Ziad Suleyman</div>
+    <div><span>Course</span> MLOPS Training &mdash; 2026/2027</div>
+    <div><span>Trainer</span> Trainer Qafza</div>
+    <div><span>Problem</span> Predict late vs on-time delivery</div>
+    <div><span>Deliverable</span> FastAPI inference service, v1.2.0</div>
+    <div><span>Repository</span> github.com/ziadSuleyman/MLOPS &rarr; <code>mlops-task3/</code></div>
+    <div><span>Commit</span> <code>a5b49cb</code> &middot; CI green</div>
+    <div><span>Model version</span> <code>f9fcc48ef9ef</code> (hash of the artifacts)</div>
+    <div><span>Tests</span> 173 passed, 0 skipped</div>
+    <div><span>Report date</span> 24 September 2026</div>
+  </div>
+  <p class="foot">Every console output in this report was captured on 24 September 2026 from a<br>
+  fresh <code>git clone</code> of the repository, started with one command on empty Docker volumes.</p>
+</section>
+
+<!-- ======================= 0 CHECKLIST ======================= -->
+<h2>0. Definition of done &mdash; self-check against the task sheet</h2>
+
+<h3>You should have</h3>
+<table class="avoid">
+  <thead><tr><th style="width:42%">Criterion (from the task PDF)</th><th style="width:8%">Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>1. A structured repository with config files, requirements, and a README that works from zero</td><td class="ok">Done</td>
+        <td>&sect;1 folder layout &middot; &sect;4 the README's Quick Start run on a fresh clone</td></tr>
+    <tr><td>2. An inference pipeline in Python modules that loads the saved fitted objects and the registered model</td><td class="ok">Done</td>
+        <td>&sect;2 modules &middot; &sect;7 the API loads <code>olist-late-predictor@production</code> from MLflow</td></tr>
+    <tr><td>3. Data versioning with DVC, data validation with Great Expectations, tracking with MLflow</td><td class="ok">Done</td>
+        <td>&sect;6 validation &middot; &sect;7 DVC pointers + MLflow run, registry, alias and stage</td></tr>
+    <tr><td>4. Unit tests and integration tests that pass with one command</td><td class="ok">Done</td>
+        <td>&sect;8 <code>pytest</code> &rarr; 173 passed, 0 skipped</td></tr>
+    <tr><td>5. A FastAPI service with health, model info, and predict routes</td><td class="ok">Done</td>
+        <td>&sect;5 six routes, schema-validated, Swagger docs</td></tr>
+    <tr><td>6. Docker Compose bringing up the database, the API, and the artifact storage together</td><td class="ok">Done</td>
+        <td>&sect;4 <code>db</code> + <code>mlflow</code> (artifact store) + <code>register</code> + <code>api</code></td></tr>
+    <tr><td>7. A CI/CD pipeline that runs the tests and builds the image</td><td class="ok">Done</td>
+        <td>&sect;9 lint &rarr; tests &rarr; build &amp; push to ghcr.io</td></tr>
+    <tr><td>8. Logging and monitoring in place, with prediction logs stored</td><td class="ok">Done</td>
+        <td>&sect;10 service log, JSONL prediction log, Prometheus metrics, PSI drift</td></tr>
+  </tbody>
+</table>
+
+<h3>You should be able to</h3>
+<table class="avoid">
+  <thead><tr><th style="width:42%">Criterion (from the task PDF)</th><th style="width:8%">Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>1. Clone the repo on a clean machine and start everything with one command</td><td class="ok">Done</td>
+        <td>&sect;4 <code>docker compose up --build</code>: four services, 2 min 5 s</td></tr>
+    <tr><td>2. Send an order to the predict route and get back a prediction, a probability, and a model version</td><td class="ok">Done</td>
+        <td>&sect;5 <code>POST /predict</code> on a real test-split order</td></tr>
+    <tr><td>3. Show that the pipeline output matches your notebook output on the same input</td><td class="ok">Done</td>
+        <td>&sect;3 max score difference 2.2&times;10<sup>&minus;16</sup> over 18,603 orders; ROC-AUC 0.7107 = 0.7107</td></tr>
+    <tr><td>4. Break something on purpose &mdash; bad data, a failing test &mdash; and show the system catches it</td><td class="ok">Done</td>
+        <td>&sect;6 eight bad inputs &middot; &sect;8 a code bug &middot; &sect;9 a failing CI run &middot; &sect;7 registry down</td></tr>
+    <tr><td>5. Explain every folder, every config value, and every tool you used, and why it is there</td><td class="ok">Done</td>
+        <td>&sect;1 folders &middot; &sect;11 config values &middot; &sect;12 tools</td></tr>
+  </tbody>
+</table>
+
+<div class="pagebreak"></div>
+
+<!-- ======================= 1 REPO ======================= -->
+<h2>1. The repository</h2>
+<p>The whole training track lives in one git repository; Task 3 is the folder <code>mlops-task3/</code>.
+Its layout is the one the task sheet asks for, with no hardcoded paths or parameters in the code.</p>
+
+<svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 z" fill="#5b7086"/>
+    </marker>
+  </defs>
+  <g font-family="Segoe UI, Arial">
+    <rect x="10" y="95" width="110" height="52" rx="5" fill="#f2f6fa" stroke="#8fa6bb"/>
+    <text x="65" y="117" text-anchor="middle" font-size="10" font-weight="600" fill="#0f2740">Client</text>
+    <text x="65" y="133" text-anchor="middle" font-size="8" fill="#5b7086">curl &middot; Swagger</text>
+
+    <rect x="170" y="70" width="190" height="102" rx="5" fill="#1f5fa9" stroke="#164a86"/>
+    <text x="265" y="92" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">api &middot; FastAPI</text>
+    <text x="265" y="110" text-anchor="middle" font-size="8" fill="#cfe0f2">validate &rarr; features &rarr; predict</text>
+    <text x="265" y="124" text-anchor="middle" font-size="8" fill="#cfe0f2">&rarr; record</text>
+    <text x="265" y="144" text-anchor="middle" font-size="8" fill="#cfe0f2">/health /model/info /predict</text>
+    <text x="265" y="157" text-anchor="middle" font-size="8" fill="#cfe0f2">/predict/batch /drift /metrics</text>
+
+    <rect x="430" y="12" width="250" height="52" rx="5" fill="#f2f6fa" stroke="#8fa6bb"/>
+    <text x="555" y="34" text-anchor="middle" font-size="10" font-weight="600" fill="#0f2740">mlflow &middot; registry + artifact store</text>
+    <text x="555" y="50" text-anchor="middle" font-size="8" fill="#5b7086">olist-late-predictor @production</text>
+
+    <rect x="430" y="95" width="250" height="52" rx="5" fill="#f2f6fa" stroke="#8fa6bb"/>
+    <text x="555" y="117" text-anchor="middle" font-size="10" font-weight="600" fill="#0f2740">register &middot; one-off</text>
+    <text x="555" y="133" text-anchor="middle" font-size="8" fill="#5b7086">puts the DVC-tracked files in MLflow, exits</text>
+
+    <rect x="430" y="178" width="250" height="52" rx="5" fill="#f2f6fa" stroke="#8fa6bb"/>
+    <text x="555" y="200" text-anchor="middle" font-size="10" font-weight="600" fill="#0f2740">db &middot; PostgreSQL 16</text>
+    <text x="555" y="216" text-anchor="middle" font-size="8" fill="#5b7086">Olist schema &middot; outcomes join later</text>
+
+    <rect x="170" y="200" width="190" height="40" rx="5" fill="#fff" stroke="#8fa6bb" stroke-dasharray="4 3"/>
+    <text x="265" y="218" text-anchor="middle" font-size="9" font-weight="600" fill="#0f2740">logs/predictions.jsonl</text>
+    <text x="265" y="231" text-anchor="middle" font-size="8" fill="#5b7086">one line per order</text>
+  </g>
+  <g stroke="#5b7086" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+    <path d="M120,121 L166,121"/>
+    <path d="M555,95 L555,68"/>
+    <path d="M430,38 L395,38 L395,100 L364,100"/>
+    <path d="M265,172 L265,196"/>
+    <path d="M430,204 L364,204 L364,160"/>
+  </g>
+  <g font-family="Segoe UI, Arial" font-size="7.5" fill="#5b7086">
+    <text x="401" y="84">download + md5 check</text>
+    <text x="560" y="84">register</text>
+  </g>
+</svg>
+
+<table>
+  <thead><tr><th style="width:21%">Folder / file</th><th>What is in it, and why it is there</th></tr></thead>
+  <tbody>
+    <tr><td><code>app/</code></td><td>The FastAPI service: <code>main.py</code> (routes, start-up checks, error handling) and <code>schemas.py</code> (Pydantic request/response models). Kept apart from <code>src/</code> so the pipeline can run without a web server.</td></tr>
+    <tr><td><code>src/</code></td><td>The inference pipeline, one concern per module (&sect;2). Everything the API and the scripts share.</td></tr>
+    <tr><td><code>config/settings.yaml</code></td><td>Every path, parameter and threshold (132 lines). Secrets are not here; they come from <code>.env</code> (&sect;11).</td></tr>
+    <tr><td><code>models/</code></td><td>The four serving artifacts and their four <code>.dvc</code> pointer files. The same bytes are registered in MLflow.</td></tr>
+    <tr><td><code>data/</code></td><td>Placeholder for input data. The service reads no data files: orders arrive in the request, outcomes come from the database.</td></tr>
+    <tr><td><code>notebooks/</code></td><td>The six Task 2 notebooks, byte-for-byte reference copies. Not in the image, not linted.</td></tr>
+    <tr><td><code>tests/</code></td><td>173 pytest tests in 14 modules, plus <code>fixtures/parity_orders.parquet</code> (314 real orders with the notebook's features).</td></tr>
+    <tr><td><code>scripts/</code></td><td>Offline operations: build the serving reference, build the parity fixture, register the model, compare local vs registry, analyse the prediction log, score it against real deliveries.</td></tr>
+    <tr><td><code>requirements/</code></td><td><code>base.txt</code> = runtime (in the image), <code>dev.txt</code> = <code>-r base.txt</code> + pytest, ruff, pre-commit, DVC, Jupyter. Every version pinned.</td></tr>
+    <tr><td><code>logs/</code></td><td>Runtime output: <code>service.log</code> and <code>predictions.jsonl</code>. Gitignored; bind-mounted from the container.</td></tr>
+    <tr><td><code>docs/</code></td><td><code>ARCHITECTURE.md</code> (modules, data flow, error table) and <code>DEPLOYMENT.md</code> (deploy, update the model, post-deploy checklist).</td></tr>
+    <tr><td><code>Dockerfile</code>, <code>docker-compose.yml</code>, <code>.env.example</code></td><td>The image, the four-service stack, and the template for secrets (&sect;4).</td></tr>
+    <tr><td><code>.dvc/</code>, <code>.pre-commit-config.yaml</code>, <code>pyproject.toml</code></td><td>DVC remote config; the hooks run before every commit; ruff and pytest settings.</td></tr>
+    <tr><td><code>../.github/workflows/task3-ci.yml</code></td><td>The CI pipeline. It sits at the repository root because GitHub reads workflows only from there.</td></tr>
+  </tbody>
+</table>
+
+<h3>Pinned requirements</h3>
+<p>The runtime is pinned to the environment the Task 2 artifacts were pickled in:
+Python 3.13, scikit-learn 1.9.0, pandas 3.0.5, numpy 2.5.1. The MLflow client is pinned to the
+server image (3.16.1). <code>src/artifacts.load_pickle</code> refuses to load the model under any
+other scikit-learn version rather than log a warning and serve anyway.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 1 &mdash; requirements/base.txt (runtime, excerpt)</div>
+<pre>fastapi==0.141.1          pandas==3.0.5          scikit-learn==1.9.0     pyyaml==6.0.3
+uvicorn[standard]==0.52.4 numpy==2.5.1           scipy==1.18.0           python-dotenv==1.2.3
+pydantic==2.13.5          pyarrow==25.0.1        joblib==1.5.3           mlflow==3.16.1
+pydantic-settings==2.15.0 sqlalchemy==2.0.51     great-expectations==1.23.0
+                          psycopg[binary]==3.3.4 prometheus-client==0.26.0
+<i># dev.txt:  -r base.txt  + pytest==9.1.1  pytest-cov==7.1.0  httpx==0.28.1  ruff==0.16.7
+#           pre-commit==4.2.0  dvc==3.67.1  jupyterlab==4.6.2  ipykernel==7.3.0</i></pre>
+</div>
+
+
+
+<!-- ======================= 2 MODULES ======================= -->
+<h2>2. From notebooks to Python modules</h2>
+<p>Only the inference half of the notebooks was ported; training stays in Notebook 6. Each module does one
+job, and the fitted objects are loaded, never fitted.</p>
+
+<table>
+  <thead><tr><th style="width:24%">Module</th><th style="width:22%">Ported from</th><th>Responsibility</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/config.py</code></td><td>&mdash;</td><td>Loads <code>settings.yaml</code> + <code>.env</code> into typed objects; invalid settings stop the start-up</td></tr>
+    <tr><td><code>src/logger.py</code></td><td>&mdash;</td><td>Rotating file handler (10 MB &times; 5) + console handler</td></tr>
+    <tr><td><code>src/validation.py</code></td><td>NB 1&ndash;2 (data facts)</td><td>Per-order rules: fatal problems vs. rule problems</td></tr>
+    <tr><td><code>src/ge_validation.py</code></td><td>NB 4 (ranges)</td><td>Great Expectations suite, 70 expectations, for batches</td></tr>
+    <tr><td><code>src/preprocessing.py</code></td><td>NB 5 &sect;2 <code>build_derived</code></td><td>Pure row-level transforms: haversine distance, promised days, ratios, flags</td></tr>
+    <tr><td><code>src/features.py</code></td><td>NB 5 transformers</td><td>Applies the saved target encoders, one-hot encoder and imputer &rarr; exactly 31 features</td></tr>
+    <tr><td><code>src/predict.py</code></td><td>NB 6</td><td>Loads the model, scales, scores, calibrates, applies the alert threshold</td></tr>
+    <tr><td><code>src/reference.py</code>, <code>src/alerting.py</code></td><td>NB 6 (alert budget)</td><td>Calibration, risk percentile, PSI bins; the 5% alert budget as a rolling threshold</td></tr>
+    <tr><td><code>src/pipeline.py</code></td><td>&mdash;</td><td>Orchestrates validate &rarr; features &rarr; predict &rarr; record, for one order or a batch</td></tr>
+    <tr><td><code>src/monitoring.py</code></td><td>&mdash;</td><td>Prometheus metrics, PSI drift window, JSONL prediction log</td></tr>
+    <tr><td><code>src/evaluation.py</code></td><td>NB 2 (label)</td><td>Scores logged predictions against real deliveries with the calendar-day label</td></tr>
+    <tr><td><code>src/artifacts.py</code>, <code>src/registry.py</code></td><td>&mdash;</td><td>Model version = hash of the artifacts; DVC pointer check; MLflow register and load</td></tr>
+  </tbody>
+</table>
+
+<h3>Fitted objects are loaded, never fitted</h3>
+<p>The service loads four artifacts. The first two are Task 2's files, unchanged:</p>
+<ul>
+  <li><code>05_transformers.joblib</code>: <code>kept_categories</code>, <code>target_encoders</code>, <code>onehot_payment</code>,
+      <code>imputer</code>, <code>feature_columns</code>, <code>scaler</code>, <code>metadata</code></li>
+  <li><code>06_model.joblib</code>: <code>LogisticRegression(C=0.3, class_weight="balanced")</code>, 31 features</li>
+  <li><code>05_feature_list.json</code>: the 31-feature contract</li>
+  <li><code>07_serving_reference.json</code>: Platt calibration and the validation-score percentiles. Built offline from the <b>validation</b>
+      split by <code>scripts/build_serving_reference.py</code>. It records the model's md5, and the service refuses it for any other model.</li>
+</ul>
+<p>The config key <code>inference.refit</code> is <code>false</code>, and the service refuses to start if it is set to <code>true</code>.
+The start-up log lists exactly what was loaded:</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 2 &mdash; logs/service.log at start-up (clean stack)</div>
+<pre>[2026-09-24 16:56:34] [INFO] [olist] Starting Olist Late Delivery Predictor v1.2.0
+[2026-09-24 16:56:36] [INFO] [olist] Loading transformers from /tmp/olist-registry-wc0oqcd0/serving/05_transformers.joblib
+[2026-09-24 16:56:37] [INFO] [olist] Transformers loaded: ['kept_categories', 'target_encoders', 'onehot_payment',
+                                     'imputer', 'feature_columns', 'scaler', 'metadata']  |  <b>31 features</b>
+[2026-09-24 16:56:37] [INFO] [olist] Loading model from /tmp/olist-registry-wc0oqcd0/serving/06_model.joblib
+[2026-09-24 16:56:37] [INFO] [olist] Model loaded: LogisticRegression  |  31 features  |  requires_scaling=True
+[2026-09-24 16:56:37] [INFO] [olist] Serving reference loaded: built on validation (13547 orders, late rate 5.53%)
+[2026-09-24 16:56:38] [INFO] [olist] Serving model <b>f9fcc48ef9ef</b></pre>
+</div>
+<p class="small">The paths are under <code>/tmp/olist-registry-&hellip;/serving/</code>: the files were downloaded from the MLflow
+registry, not read from the image's <code>models/</code> folder (&sect;7).</p>
+
+<!-- ======================= 3 PARITY ======================= -->
+<h2>3. The pipeline reproduces the notebooks</h2>
+<p>This was checked in two ways, both on real test-split orders:</p>
+<ol>
+  <li><b>Features.</b> Raw orders go through <code>src/</code>. The 31 features that come out are compared with
+      the values Notebook 5 wrote to <code>05_features_test.parquet</code>.</li>
+  <li><b>Scores.</b> The model is applied to the service's features and to the notebook's features, and the scores are compared.
+      On the full test split the two ROC-AUC values must match.</li>
+</ol>
+<div class="evidence">
+  <div class="cap">EVIDENCE 3 &mdash; service vs. notebooks, measured inside the service image</div>
+<pre>Fixture: 314 real test-split orders x 31 features
+  max |service feature - notebook feature| = 4.547e-13
+  max |service score   - notebook score|   = <b>0.000e+00</b>
+Full test split: 18603 orders
+  max |service score - notebook score| = <b>2.220e-16</b>
+  ROC-AUC  service <b>0.7107</b>   notebook 6 <b>0.7107</b>
+  PR-AUC   service <b>0.0849</b>   notebook 6 <b>0.0849</b></pre>
+</div>
+<p>The 314-order fixture includes the awkward cases on purpose: missing customer coordinates, a missing category, missing photos,
+east-coast longitudes, and coordinates outside Brazil. It is committed, so <code>tests/test_parity.py</code> runs these
+checks in CI on every push (&sect;8). The largest feature difference, 4.5&times;10<sup>&minus;13</sup>, is floating-point
+rounding in the haversine formula.</p>
+<p>Parity also holds through the whole running system. The 18,603 orders were sent to the live API, logged, and
+later scored against the database (&sect;10.4). That run gave the same ROC-AUC, 0.7107.</p>
+
+
+
+<!-- ======================= 4 CLEAN START ======================= -->
+<h2>4. One command on a clean machine</h2>
+<p>The repository was cloned from GitHub into an empty folder and started with the README's Quick Start.
+The compose project was given a new name (<code>-p task3clean</code>), so Docker created every volume empty.
+No state came from earlier runs: no database, no MLflow registry, no cached model.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 4 &mdash; clone and start</div>
+<pre>$ git clone https://github.com/ziadSuleyman/MLOPS.git && cd MLOPS/mlops-task3
+$ git log -1 --format="%h %s"
+a5b49cb Task 3: CI pushes the image to ghcr.io after lint and tests pass
+$ cp .env.example .env
+$ API_PORT=8010 docker compose -p task3clean up --build -d        <i># 8000 is taken on this machine</i>
+ Volume task3clean_mlflow_data Created
+ Container task3clean-mlflow-1 Healthy
+ Container task3clean-db-1 Healthy
+ Container task3clean-register-1 Exited
+ Container task3clean-api-1 Started
+real    <b>2m5.679s</b>
+
+SERVICE    STATUS                        PORTS
+api        Up 2 seconds                  0.0.0.0:8010-&gt;8000/tcp
+db         Up About a minute (healthy)   0.0.0.0:5433-&gt;5432/tcp
+mlflow     Up About a minute (healthy)   0.0.0.0:5000-&gt;5000/tcp
+register   <b>Exited (0)</b></pre>
+</div>
+
+<p>The start-up order is enforced by <code>depends_on</code> conditions:</p>
+<ol>
+  <li><code>db</code> and <code>mlflow</code> start and pass their health checks.</li>
+  <li><code>register</code> puts the model in the empty registry and exits with code 0.</li>
+  <li><code>api</code> starts only after that exit, and loads the model back from the registry.</li>
+</ol>
+<div class="evidence">
+  <div class="cap">EVIDENCE 5 &mdash; the one-off register step, on an empty MLflow</div>
+<pre>Experiment with name 'olist-late-predictor' does not exist. Creating a new experiment.
+Successfully registered model 'olist-late-predictor'.
+Created version '1' of model 'olist-late-predictor'.
+[INFO] [olist] Registered f9fcc48ef9ef as olist-late-predictor version 1 (run a5ae01770dde4628b4ba61d8c2e13509)
+[MLflow] Alias <b>'production'</b> and stage <b>'Production'</b> -&gt; version 1</pre>
+</div>
+
+<h3>The image</h3>
+<table class="avoid">
+  <tbody>
+    <tr><td style="width:30%">Base</td><td><code>python:3.13-slim</code></td></tr>
+    <tr><td>Size</td><td>302 MB compressed. Most of it is the pinned ML stack: <code>site-packages</code> holds 867 MB unpacked (MLflow, Great Expectations, scikit-learn, pandas).</td></tr>
+    <tr><td>Contents of <code>/app</code></td><td><code>app config logs models requirements scripts src</code>: no notebooks, no tests, no dev tools</td></tr>
+    <tr><td>User</td><td><code>appuser</code> (non-root), which owns <code>logs/</code></td></tr>
+    <tr><td>Secrets</td><td>None in the image or the repository. <code>DB_*</code> and <code>MLFLOW_TRACKING_URI</code> come from the environment; <code>.env</code> is gitignored and <code>.env.example</code> is the template.</td></tr>
+  </tbody>
+</table>
+<p class="small">The <code>db</code> service uses its own empty volume with the Olist schema. The prediction service does not read it.
+The historical orders used to score predictions (&sect;10.4) are in the Task 1 database container, which uses the same port, 5433.</p>
+
+
+
+<!-- ======================= 5 API ======================= -->
+<h2>5. The API</h2>
+<table class="avoid">
+  <thead><tr><th style="width:20%">Route</th><th>Returns</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /health</code></td><td>Status, model loaded, <code>model_version</code>, service version, and where the model came from</td></tr>
+    <tr><td><code>GET /model/info</code></td><td>Model type, 31 features, hyperparameters, validation and test metrics, md5 of every artifact, calibration, alert policy</td></tr>
+    <tr><td><code>POST /predict</code></td><td>One order &rarr; prediction, probability, score, risk percentile, alert threshold, model version, latency</td></tr>
+    <tr><td><code>POST /predict/batch</code></td><td>Up to 500 orders (<code>inference.batch_max_size</code>); each one is validated, predicted and logged</td></tr>
+    <tr><td><code>GET /drift</code></td><td>PSI of the last 1,000 scores against the validation split, alert ratio, mean probability</td></tr>
+    <tr><td><code>GET /metrics</code></td><td>Prometheus text format (&sect;10.2)</td></tr>
+  </tbody>
+</table>
+
+<div class="two">
+<div class="evidence">
+  <div class="cap">EVIDENCE 6 &mdash; GET /health</div>
+<pre>{
+  "status": "healthy",
+  "model_loaded": true,
+  "model_version": "<b>f9fcc48ef9ef</b>",
+  "service_version": "1.2.0",
+  "model_source": "<b>olist-late-predictor@production</b>
+     (version 1, run a5ae0177...)"
+}</pre>
+</div>
+<div class="evidence">
+  <div class="cap">EVIDENCE 7 &mdash; GET /model/info (excerpt)</div>
+<pre>"model_type": "LogisticRegression",
+"n_features": 31,
+"hyperparameters": {"C": 0.3,
+  "class_weight": "balanced", "max_iter": 3000},
+"label_definition": "calendar-day rule",
+"metrics": {
+  "validation": {"ROC-AUC": 0.7739, "PR-AUC": 0.1709},
+  "test":       {"ROC-AUC": 0.7107, "PR-AUC": 0.0849}},
+"artifacts_md5": {"model": "f352d02d...", ...}</pre>
+</div>
+</div>
+
+<h3>A prediction</h3>
+<p>The request below is order <code>8a9be36f&hellip;</code>, a real order from the test split. It is also the example body shown in the
+Swagger docs, so the docs example returns 200.</p>
+<div class="two">
+<div class="evidence">
+  <div class="cap">EVIDENCE 8a &mdash; POST /predict (request)</div>
+<pre>{
+  "order_id": "8a9be36ffd78382f9ac518945e909636",
+  "order_purchase_timestamp": "2018-06-01 04:19:11",
+  "order_estimated_delivery_date": "2018-07-05",
+  "shipping_limit_first": "2018-06-11 04:30:37",
+  "customer_state": "MG", "main_seller_state": "SP",
+  "customer_lat": -19.5175, "customer_lng": -42.6117,
+  "seller_lat": -23.6524, "seller_lng": -46.7555,
+  "freight_total": 18.43, "freight_max": 18.43,
+  "items_price_total": 78.0, "items_price_max": 78.0,
+  "payment_total": 96.43, "installments_max": 4,
+  "n_payments": 1, "main_payment_type": "credit_card",
+  "n_items": 1, "n_products": 1, "n_sellers": 1,
+  "n_categories": 1, "weight_g_total": 250,
+  "photos_avg": 4, "main_category": "relogios_presentes"
+}</pre>
+</div>
+<div>
+<div class="evidence">
+  <div class="cap">EVIDENCE 8b &mdash; response 200</div>
+<pre>{
+  "order_id": "8a9be36ffd78382f9ac518945e909636",
+  "prediction": "<b>on_time</b>",
+  "probability": <b>0.0221</b>,
+  "score": 0.3197,
+  "risk_percentile": 20.8,
+  "alert_threshold": 0.7538,
+  "model_version": "<b>f9fcc48ef9ef</b>",
+  "latency_ms": 165.14,
+  "validation_warnings": null
+}</pre>
+</div>
+<div class="evidence" style="margin-top:10px">
+  <div class="cap">EVIDENCE 8c &mdash; same order, promise cut to 7 days, customer moved to S&atilde;o Lu&iacute;s (MA)</div>
+<pre>  "prediction": "<b>late</b>",
+  "probability": <b>0.6835</b>,
+  "score": 0.9664,
+  "risk_percentile": 99.8,</pre>
+</div>
+</div>
+</div>
+
+<p>The response has three outputs:</p>
+<ul>
+  <li><b><code>probability</code></b> is calibrated. The model's raw <code>score</code> is not a probability: it was trained class-balanced, so it averages 0.49.
+      Platt scaling, fitted on the validation split, maps the score to a probability. On the test split the Brier score fell from 0.2685 (raw) to 0.0379 (calibrated).</li>
+  <li><b><code>prediction</code></b> is <code>late</code> when the order is in the riskiest 5% of recent orders (the alert budget from Notebook 6).
+      A 0.5 cut-off would flag 49.3% of test orders; the budget flagged 5.4% (&sect;10.3).</li>
+  <li><b><code>model_version</code></b> is not typed by hand. It is a hash of the four artifacts, so any change to them changes it.</li>
+</ul>
+
+<div class="figure">
+  <img src="{{FIG:swagger_docs}}" alt="Swagger UI" style="max-width:88%">
+  <div class="cap">Figure 1 &mdash; the automatic docs at <code>/docs</code> on the clean stack: six routes and eight request/response schemas</div>
+</div>
+
+
+
+<!-- ======================= 6 VALIDATION ======================= -->
+<h2>6. Data validation and error handling</h2>
+<p>An order passes three checks before it reaches the model. Every rejection is a clear HTTP 422, and the service keeps running.</p>
+<table class="avoid">
+  <thead><tr><th style="width:24%">Layer</th><th style="width:22%">Runs on</th><th>Checks</th></tr></thead>
+  <tbody>
+    <tr><td>Pydantic schema (<code>app/schemas.py</code>)</td><td>every request</td><td>Required fields, types, no NaN or Infinity, batch size &le; 500</td></tr>
+    <tr><td>Per-order rules (<code>src/validation.py</code>)</td><td>every order</td><td>Dates parseable and promise after purchase; states among the 27 Brazilian states; payment type known; money and weight &ge; 0; counts &ge; 1; coordinates on Earth. None of the 96,470 real orders breaks a rule.</td></tr>
+    <tr><td>Great Expectations (<code>src/ge_validation.py</code>)</td><td>every batch</td><td>70 expectations: column existence (24), numeric ranges (13), coordinates within Brazil's bounding box (4), allowed categories (3), missing-rate limits (22), positive counts (4), no leakage columns (1)</td></tr>
+  </tbody>
+</table>
+<p>The Great Expectations suite describes a population ("95% of freight values in the usual range", "at most 10% missing coordinates"),
+so it runs on batches rather than on single orders. One run takes about 0.9 s; one prediction takes about 40 ms.</p>
+<p><b>Policy when validation fails</b> (<code>validation.on_failure</code>):</p>
+<ul>
+  <li><code>reject</code> (the default): HTTP 422 with the list of problems.</li>
+  <li><code>flag</code>: the order is scored anyway, and the problems are attached to the response, the log and a Prometheus counter.</li>
+  <li>Problems that make scoring impossible (missing or unreadable dates, non-numbers) always reject, whatever the policy.</li>
+</ul>
+
+<h3>Breaking it on purpose &mdash; bad data</h3>
+<p>Eight bad requests were sent to the clean stack. All eight were caught, and <code>/health</code> stayed <code>healthy</code> afterwards.</p>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:30%">What was sent</th><th style="width:9%">Status</th><th>Service answer</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>freight_total: -5.0</code></td><td class="num">422</td><td><code>"freight_total must be &gt;= 0, got -5.0"</code></td></tr>
+    <tr><td>2</td><td><code>customer_state: "XX"</code></td><td class="num">422</td><td><code>"Unknown customer_state: 'XX'. Allowed: ['AC', 'AL', &hellip; 'TO']"</code></td></tr>
+    <tr><td>3</td><td>promise date before the purchase</td><td class="num">422</td><td><code>"order_estimated_delivery_date must be after order_purchase_timestamp"</code></td></tr>
+    <tr><td>4</td><td><code>order_purchase_timestamp</code> missing</td><td class="num">422</td><td><code>"type": "missing", "loc": ["body", "order_purchase_timestamp"]</code></td></tr>
+    <tr><td>5</td><td><code>freight_total: "eighteen"</code></td><td class="num">422</td><td><code>"float_parsing" &hellip; "unable to parse string as a number"</code></td></tr>
+    <tr><td>6</td><td>malformed JSON <code>{not json</code></td><td class="num">422</td><td><code>"type": "json_invalid", "msg": "JSON decode error"</code></td></tr>
+    <tr><td>7</td><td>batch of 501 orders</td><td class="num">422</td><td><code>"List should have at most 500 items after validation, not 501"</code></td></tr>
+    <tr><td>8</td><td>batch of 40 orders, half with freight 4,800 (each legal alone)</td><td class="num">422</td><td><code>"Batch validation failed"</code> &mdash; Great Expectations (below)</td></tr>
+  </tbody>
+</table>
+<div class="evidence">
+  <div class="cap">EVIDENCE 9 &mdash; case 8: every order passes the per-order rules; the batch fails Great Expectations</div>
+<pre>HTTP 422
+{
+  "detail": "Batch validation failed",
+  "errors": [{ "batch": [
+      "batch check failed: <b>expect_column_values_to_be_between on freight_total</b>",
+      "batch check failed: <b>expect_column_values_to_be_between on freight_max</b>" ] }]
+}</pre>
+</div>
+<p>Each rejection is counted in <code>prediction_errors_total{error_type="validation"}</code> (&sect;10.2). Model errors and unexpected
+errors return 500 with the label <code>internal</code>. The service also refuses to <i>start</i> in any of these cases:</p>
+<ul>
+  <li><code>refit: true</code>, or an unknown <code>on_failure</code> or <code>model.source</code> value</li>
+  <li>registry files whose md5 differs from what was recorded for that version</li>
+  <li>a scikit-learn version mismatch</li>
+  <li>a serving reference built for another model</li>
+  <li>a leakage column in the feature contract</li>
+</ul>
+
+
+
+<!-- ======================= 7 VERSIONING ======================= -->
+<h2>7. Versioning: DVC and MLflow</h2>
+
+<h3>7.1 DVC &mdash; the artifacts</h3>
+<p>The four serving artifacts are tracked by DVC, and each <code>.dvc</code> pointer records the file's md5. The remote,
+<code>localstore</code>, is a folder outside the repository. It has been pushed to and pulled from.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 10 &mdash; DVC state</div>
+<pre>$ python -m dvc status
+Data and pipelines are up to date.
+$ python -m dvc status -c
+Cache and remote 'localstore' are in sync.
+$ cat models/06_model.joblib.dvc
+outs:
+- md5: <b>f352d02dae6a49f48e499dfd54c85e0b</b>
+  size: 2280
+  path: 06_model.joblib</pre>
+</div>
+<p>The artifacts are small (1&ndash;8 KB), so they are also committed to git and copied into the image. That lets CI run the tests without
+access to the DVC remote. The DVC remote is a local folder. Copies outside this laptop are the image on
+<code>ghcr.io/ziadsuleyman/olist-late-predictor</code> and the MLflow artifact store volume.</p>
+
+<h3>7.2 MLflow &mdash; tracking and registry</h3>
+<p><code>scripts/register_model.py</code> creates one run in the experiment <code>olist-late-predictor</code>. The run logs the parameters,
+the validation and test metrics, and the four serving files. The model is registered as <code>olist-late-predictor</code>, and the new
+version gets the alias <code>production</code> and the stage <code>Production</code>. MLflow deprecated stages in 2.9, so both are
+set, and the service reads the alias.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 11 &mdash; the clean stack's registry, read back through the MLflow REST API</div>
+<pre>aliases:  [{'alias': 'production', 'version': '1'}]
+version:  1   stage: <b>Production</b>   status: READY
+version tags: model_version=<b>f9fcc48ef9ef</b>
+              md5_model=<b>f352d02dae6a49f48e499dfd54c85e0b</b>   md5_transformers=6a175ab09db74cb40e8d2d3877e928a8
+              md5_feature_list=c8a67aba56ef8826f1587c4159233b18   md5_reference=3e7e841f57893f37f0705fa3d0e9bb2e
+params:   C=0.3  class_weight=balanced  max_iter=3000  n_features=31  requires_scaling=True
+          label_definition=calendar-day rule (notebook 2)
+metrics:  validation_ROC-AUC=0.7739  validation_PR-AUC=0.1709  validation_recall_at_5pct=20.7  validation_lift=4.14
+          test_ROC-AUC=0.7107        test_PR-AUC=0.0849        test_recall_at_5pct=15.0        test_lift=3.01
+artifacts (serving/):  05_feature_list.json 1301 B   05_transformers.joblib 7779 B
+                       06_model.joblib 2280 B        07_serving_reference.json 2842 B</pre>
+</div>
+<div class="figure">
+  <img src="{{FIG:mlflow_registry}}" alt="MLflow registry" style="max-width:74%">
+  <div class="cap">Figure 2 &mdash; the MLflow UI on the clean stack: version 1 carries the md5 tags and the alias <code>@ production</code></div>
+</div>
+
+<h3>7.3 One chain of hashes</h3>
+<p>At start-up the API looks up <code>olist-late-predictor@production</code> and downloads that version's <code>serving/</code> files.
+It checks each file's md5 against the version's tags <b>and</b> against the DVC pointers, and loads the files only if both match.
+The same md5 therefore appears in four places:</p>
+<ul>
+  <li>the DVC pointer (<code>models/06_model.joblib.dvc</code>)</li>
+  <li>the MLflow version tag (<code>md5_model</code>)</li>
+  <li><code>GET /model/info &rarr; artifacts_md5.model</code></li>
+  <li>the <code>model_version</code> hash reported in every response</li>
+</ul>
+<table class="avoid">
+  <thead><tr><th style="width:44%">Situation</th><th>What the API does</th></tr></thead>
+  <tbody>
+    <tr><td>Registry reachable, files check out</td><td>Serves the registry version; <code>model_source</code> names it</td></tr>
+    <tr><td>Registry unreachable or not configured</td><td>Serves the same DVC-tracked bytes from <code>models/</code>, and says so</td></tr>
+    <tr><td>Registry serves bytes different from those recorded</td><td><b>Refuses to start</b> (tested: <code>test_tampered_version_is_refused</code>)</td></tr>
+  </tbody>
+</table>
+<div class="evidence">
+  <div class="cap">EVIDENCE 12 &mdash; breaking it on purpose: MLflow stopped, API restarted</div>
+<pre>$ docker compose -p task3clean stop mlflow && docker compose -p task3clean restart api
+[WARNING] [olist] Model source: models/ (registry olist-late-predictor@production unavailable:
+                  &lt;urlopen error [Errno -5] No address associated with hostname&gt;)
+$ curl localhost:8010/health
+{"status": "healthy", "model_loaded": true, "model_version": "<b>f9fcc48ef9ef</b>", "service_version": "1.2.0",
+ "model_source": "<b>models/</b> (registry olist-late-predictor@production unavailable: ...)"}</pre>
+</div>
+<p class="small">The same <code>model_version</code> was served from the fallback. After MLflow was started again, a restart
+returned <code>model_source</code> to <code>olist-late-predictor@production (version 1, &hellip;)</code>.</p>
+
+
+
+<!-- ======================= 8 TESTING ======================= -->
+<h2>8. Testing</h2>
+<p>The whole suite runs with one command, <code>pytest</code>. It was run here inside the image the clean stack built, with the Task 2
+artifacts mounted, so the optional full-test-split parity test ran as well.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 13 &mdash; pytest inside olist-late-predictor (clean clone)</div>
+<pre>$ python -m pytest
+...
+================= <b>173 passed</b>, 47 warnings in 131.10s (0:02:11) =================</pre>
+</div>
+<p class="small">The 47 warnings are scikit-learn's <code>X has feature names, but LogisticRegression was fitted without feature names</code>.
+The Task 2 model was fitted on a numpy array; the service passes the columns in the contract's order, and parity confirms the result.</p>
+
+<table>
+  <thead><tr><th style="width:24%">Module</th><th class="num" style="width:7%">Tests</th><th style="width:16%">Kind</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td><code>test_preprocessing.py</code></td><td class="num">11</td><td>unit</td><td>haversine, derived columns, edge cases</td></tr>
+    <tr><td><code>test_features.py</code></td><td class="num">15</td><td>unit / data</td><td>transformers applied, exactly 31 features, no NaN, no leakage, Infinity handled</td></tr>
+    <tr><td><code>test_validation.py</code></td><td class="num">25</td><td>data</td><td>every rule, fatal vs. problem, all 96,470 real orders pass</td></tr>
+    <tr><td><code>test_ge_validation.py</code></td><td class="num">15</td><td>data</td><td>GE ranges, sets, null rates, leakage, a real batch, east-coast longitudes</td></tr>
+    <tr><td><code>test_reference.py</code></td><td class="num">7</td><td>unit</td><td>calibration, risk percentile, PSI bins, model guard</td></tr>
+    <tr><td><code>test_alerting.py</code></td><td class="num">8</td><td>unit</td><td>alert budget, rolling threshold, fallback threshold</td></tr>
+    <tr><td><code>test_predict.py</code></td><td class="num">15</td><td>model</td><td>model loads, output shape and range, behaviour on known inputs</td></tr>
+    <tr><td><code>test_parity.py</code></td><td class="num">6</td><td>model</td><td>service = notebooks (&sect;3)</td></tr>
+    <tr><td><code>test_pipeline.py</code></td><td class="num">17</td><td>integration</td><td>end to end, one log line per order, <code>on_failure</code>, GE on batches</td></tr>
+    <tr><td><code>test_monitoring.py</code></td><td class="num">11</td><td>unit</td><td>JSONL log, PSI, drift snapshot, test-log isolation</td></tr>
+    <tr><td><code>test_evaluation.py</code></td><td class="num">9</td><td>unit</td><td>calendar-day label, join by <code>order_id</code>, metrics</td></tr>
+    <tr><td><code>test_artifacts.py</code></td><td class="num">8</td><td>unit</td><td>version hash, DVC pointers, scikit-learn version guard</td></tr>
+    <tr><td><code>test_api.py</code></td><td class="num">17</td><td>integration</td><td>every route end to end through FastAPI's TestClient, every 422</td></tr>
+    <tr><td><code>test_registry.py</code></td><td class="num">9</td><td>integration</td><td>register (alias, stage, tags), download + md5 check, tampering refused, fallback</td></tr>
+  </tbody>
+</table>
+<p class="small">Tests write their logs to a temporary directory, never to <code>logs/predictions.jsonl</code>, and read the model from <code>models/</code>.
+<code>test_registry.py</code> uses a throw-away MLflow store.</p>
+
+<h3>Breaking it on purpose &mdash; a code bug</h3>
+<p>To check that the tests catch a realistic refactoring mistake, the Earth radius in the haversine formula was changed from 6,371 km to 6,378 km
+(the equatorial radius instead of the mean radius). The change was then reverted.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 14 &mdash; one changed constant, caught by the parity tests</div>
+<pre>-EARTH_RADIUS_KM = 6371.0
++EARTH_RADIUS_KM = 6378.0
+
+$ python -m pytest tests/test_parity.py tests/test_preprocessing.py     <i># output filtered to the failures</i>
+E   AssertionError: Features differ from the notebook:
+E   assert np.float64(<b>9.534612611823832</b>) &lt; 1e-09
+E   AssertionError: assert np.float64(0.0002516507729831141) &lt; 1e-12
+E   assert <b>0.7106 == 0.7107</b>
+<span class="bad">FAILED tests/test_parity.py::TestFeatureParity::test_features_equal_notebook
+FAILED tests/test_parity.py::TestFeatureParity::test_sample_order_is_real
+FAILED tests/test_parity.py::TestScoreParity::test_scores_equal_model_on_notebook_features
+FAILED tests/test_parity.py::TestScoreParity::test_api_path_equals_notebook
+FAILED tests/test_parity.py::TestFullTestSplit::test_roc_auc_matches_notebook_6</span>
+========================= <span class="bad">5 failed</span>, 12 passed in 9.98s =========================</pre>
+</div>
+<p>The bug moved distances by up to 9.5 km but moved ROC-AUC only in the fourth decimal (0.7107 &rarr; 0.7106).
+A metric check alone would not have noticed it. The feature-level parity test did, and in CI that failure stops the pipeline (&sect;9).</p>
+
+
+
+<!-- ======================= 9 CI ======================= -->
+<h2>9. CI/CD</h2>
+<p>GitHub Actions runs <code>.github/workflows/task3-ci.yml</code> on every push and pull request that touches <code>mlops-task3/</code>.
+It has three jobs, and each one runs only if the one before it passed:</p>
+<ol>
+  <li><b>lint</b>: <code>ruff check .</code> and <code>ruff format --check .</code></li>
+  <li><b>test</b> (<code>needs: lint</code>): <code>pip install -r requirements/dev.txt</code>, then <code>pytest tests/ -v</code></li>
+  <li><b>build</b> (<code>needs: test</code>): builds the image. On <code>main</code> it also pushes
+      <code>ghcr.io/ziadsuleyman/olist-late-predictor:&lt;sha&gt;</code> and <code>:latest</code>, using the workflow's own
+      <code>GITHUB_TOKEN</code>.</li>
+</ol>
+<p>So an image is published only after its lint and tests have passed.</p>
+
+<h3>A failing test stops the pipeline &mdash; the real history</h3>
+<p>The first CI run of Task 3 failed. On Linux, git had converted the line endings of the JSON artifacts (CRLF &rarr; LF), so their md5
+no longer matched the DVC pointers, and a test caught it. The build job did not run. The fix was
+<code>.gitattributes</code> (<code>models/*.json -text</code>), which stores the artifacts byte for byte; the next run was green.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 15 &mdash; the repository's CI runs, from the GitHub API</div>
+<pre>run 35444206539   1e34c66   <span class="bad">failure</span>   Task 3: ops scripts, Docker Compose stack, CI workflow, docs
+    Lint &amp; format check   success   (ruff check . / ruff format --check .)
+    Tests                 <span class="bad">failure</span>   (step 5: pytest tests/ -v --tb=short)
+    Docker build          <b>skipped</b>   &lt;- the image was never built or pushed
+
+run 35444923095   7ddd75f   <b>success</b>   Task 3: store serving artifacts byte-for-byte so md5s match on Linux
+
+run 35449912777   a5b49cb   <b>success</b>   Task 3: CI pushes the image to ghcr.io after lint and tests pass
+    Lint &amp; format check   success
+    Tests                 success
+    Docker build &amp; push   success   (Build / Push to ghcr.io)</pre>
+</div>
+
+<h3>Before the push: pre-commit</h3>
+<p><code>.pre-commit-config.yaml</code> runs these hooks before every commit:</p>
+<ul>
+  <li><code>check-yaml</code>, <code>check-json</code>, <code>check-toml</code></li>
+  <li><code>end-of-file-fixer</code>, <code>trailing-whitespace</code></li>
+  <li><code>no-commit-to-branch main</code></li>
+  <li><code>ruff --fix</code> and <code>ruff-format</code>, at the same ruff version as CI (0.16.7)</li>
+</ul>
+<p>On the clean clone: <code>ruff check .</code> &rarr; <code>All checks passed!</code>; <code>ruff format --check .</code> &rarr; <code>45 files already formatted</code>.</p>
+<p>Task 3 went into the repository as small commits, one concern each:</p>
+<ol>
+  <li>structure, config and pinned requirements</li>
+  <li>pipeline modules and the service</li>
+  <li>tests</li>
+  <li>operations and Compose</li>
+  <li>the line-ending fix</li>
+  <li>the registry loading</li>
+  <li>the image push</li>
+</ol>
+
+<!-- ======================= 10 MONITORING ======================= -->
+<h2>10. Logging and monitoring</h2>
+
+<h3>10.1 Logging</h3>
+<p>Nothing uses <code>print</code> in the service. <code>src/logger.py</code> writes to the console and to <code>logs/service.log</code>
+(rotating, 10 MB &times; 5), in the format <code>[time] [level] [logger] message</code>. The level comes from <code>LOG_LEVEL</code>.
+In addition, <b>every order</b> (single or batch) becomes one line in <code>logs/predictions.jsonl</code>. Each line holds the input,
+the output, the latency and the model version, plus the <code>order_id</code> so that the prediction can be scored later.</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 16 &mdash; the service log and one line of the prediction log (clean stack)</div>
+<pre>[2026-09-24 16:56:56] [INFO] [olist] Prediction: 1 order(s)  late=0  threshold=0.7538  latency=165.1ms  model=f9fcc48ef9ef
+[2026-09-24 16:56:56] [INFO] [olist] Prediction: 1 order(s)  late=1  threshold=0.7538  latency=68.2ms  model=f9fcc48ef9ef
+[2026-09-24 16:56:57] [INFO] [olist] GE validation passed: 70/70 expectations OK
+[2026-09-24 16:56:57] [INFO] [olist] Batch prediction: 2 order(s)  late=1  threshold=0.7538  latency=783.5ms  model=f9fcc48ef9ef
+
+{"timestamp": "2026-09-24T16:56:56.283768+00:00", "order_id": "<b>8a9be36ffd78382f9ac518945e909636</b>",
+ "input_hash": "5398213a11ed", "prediction": "on_time", "probability": 0.0221, "score": 0.3197,
+ "risk_percentile": 20.8, "alert_threshold": 0.7538, "model_version": "<b>f9fcc48ef9ef</b>", "latency_ms": 165.14,
+ "batch_size": 1, "validation_warnings": null,
+ "input": {"order_purchase_timestamp": "2018-06-01 04:19:11", "customer_state": "MG", ... all 24 fields}}</pre>
+</div>
+
+<h3>10.2 Service metrics &mdash; <code>GET /metrics</code></h3>
+<table class="avoid">
+  <thead><tr><th style="width:36%">Metric</th><th style="width:12%">Type</th><th>Measures</th></tr></thead>
+  <tbody>
+    <tr><td><code>prediction_requests_total{prediction}</code></td><td>counter</td><td>Request count, split late / on_time</td></tr>
+    <tr><td><code>prediction_latency_seconds</code></td><td>histogram</td><td>Latency (p50 / p95 / p99)</td></tr>
+    <tr><td><code>prediction_errors_total{error_type}</code></td><td>counter</td><td>Errors, <code>validation</code> vs <code>internal</code>; divided by requests = error rate</td></tr>
+    <tr><td><code>prediction_batch_size</code></td><td>histogram</td><td>Batch sizes</td></tr>
+    <tr><td><code>prediction_validation_warnings_total</code></td><td>counter</td><td>Orders served with warnings under <code>flag</code></td></tr>
+    <tr><td><code>prediction_score_psi</code></td><td>gauge</td><td>Drift: PSI of recent scores vs. the validation split</td></tr>
+    <tr><td><code>prediction_alert_ratio</code></td><td>gauge</td><td>Share of recent orders flagged late</td></tr>
+    <tr><td><code>prediction_mean_probability</code></td><td>gauge</td><td>Mean calibrated probability of recent orders</td></tr>
+  </tbody>
+</table>
+<div class="evidence">
+  <div class="cap">EVIDENCE 17 &mdash; /metrics after the demo requests and the eight bad inputs of &sect;6</div>
+<pre>prediction_requests_total{prediction="on_time"} 2.0
+prediction_requests_total{prediction="late"} 2.0
+prediction_latency_seconds_count 3.0
+prediction_latency_seconds_sum 1.01688
+prediction_errors_total{error_type="validation"} <b>7.0</b>
+prediction_batch_size_count 1.0
+prediction_alert_ratio 0.5
+prediction_mean_probability 0.3528</pre>
+</div>
+<p class="small">The error counter reads 7: bad inputs 1&ndash;7 of &sect;6, schema errors included. Case 8 (the GE batch) was sent after this read.</p>
+
+<h3>10.3 Prediction distribution and drift</h3>
+<p>Drift is measured as the <b>PSI of the score distribution</b> against the validation split (warn at &ge; 0.10, alert at &ge; 0.25).
+The share of orders flagged late cannot show drift, because the alert budget holds it near 5%. The real late rate cannot be the
+reference either, because it moved from 7.95% to 3.61% between the splits. The score distribution sums up the inputs, so it is what moves.</p>
+<p>To show this on the running system, all <b>18,603 test-split orders</b> were sent to the clean stack's <code>/predict/batch</code> in purchase
+order, in batches of 500 (36 s in total). <code>/drift</code> was read at the end of each month:</p>
+<table class="avoid">
+  <thead><tr><th>Test month</th><th class="num">Orders</th><th class="num">PSI (last 1,000 orders)</th><th>Status</th><th class="num">Flagged late</th><th class="num">Mean probability</th></tr></thead>
+  <tbody>
+    <tr><td>June 2018</td><td class="num">6,096</td><td class="num">0.076</td><td class="ok">ok</td><td class="num">6.2%</td><td class="num">4.8%</td></tr>
+    <tr><td>July 2018</td><td class="num">6,156</td><td class="num">0.556</td><td class="alert">alert</td><td class="num">5.6%</td><td class="num">8.5%</td></tr>
+    <tr><td>August 2018</td><td class="num">6,351</td><td class="num">0.665</td><td class="alert">alert</td><td class="num">3.2%</td><td class="num">7.6%</td></tr>
+    <tr><td><b>Whole test split</b> (log)</td><td class="num">18,603</td><td class="num">0.124</td><td class="warn">warn</td><td class="num">5.4%</td><td class="num">7.0%</td></tr>
+  </tbody>
+</table>
+<p>The whole-split figure comes from <code>scripts/analyze_predictions.py --all</code> on the prediction log. The same period is when the
+delivery promise, the model's most important feature, shrank (median promised days 27 &rarr; 19 &rarr; 13, June to August) and when
+ROC-AUC fell from 0.774 (validation) to 0.711 (test).</p>
+
+<h3>10.4 Evaluating later, when the real delivery date arrives</h3>
+<p>Every log line carries its <code>order_id</code>, so predictions can be joined to the <code>orders</code> table once the orders are delivered.
+<code>scripts/evaluate_outcomes.py</code> does this with Task 2's calendar-day label. Here it was run on the prediction log the clean
+stack had just written, against the Task 1 database:</p>
+<div class="evidence">
+  <div class="cap">EVIDENCE 18 &mdash; the prediction log scored against real deliveries</div>
+<pre>$ python scripts/evaluate_outcomes.py --all
+==================================================
+  PRODUCTION OUTCOMES
+==================================================
+{ "n_logged": 18603, "n_with_order_id": 18603, "n_delivered": 18603,
+  "late_rate": 0.0361, "roc_auc": <b>0.7107</b>, "pr_auc": <b>0.0849</b>,
+  "flagged_share": 0.0542, "precision": 0.1021, "recall": 0.1533,
+  "mean_probability": 0.0697, "brier": 0.0379 }
+  Calibration gap (mean probability - real late rate): <b>+3.36%</b>
+
+$ python scripts/analyze_predictions.py --all
+  Total predictions:   18603  (in 39 requests)
+  With order_id:       18603  (100.0%) - scorable later
+  Flagged late:        5.4%  (alert budget 5%)
+  Latency, batch  (39 requests): p50 710.3 ms  p95 1117.5 ms  p99 1148.4 ms
+  Model versions:      f9fcc48ef9ef: 18603 predictions
+  Score PSI vs validation split: 0.124  -&gt; warn</pre>
+</div>
+<p>ROC-AUC and PR-AUC here equal Notebook 6's test numbers, this time measured from the service's own log and the database. The
+calibration gap of +3.36 points has a known cause: the late rate fell from 5.53% on the validation split, where the calibration was
+fitted, to 3.61% on the test split.</p>
+
+<h3>10.5 What to alert on</h3>
+<table class="avoid">
+  <thead><tr><th style="width:32%">Signal</th><th style="width:26%">Rule</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td><code>prediction_score_psi</code></td><td>&ge; 0.10 warn, &ge; 0.25 alert</td><td>Input drift: check the inputs, then recalibrate or retrain</td></tr>
+    <tr><td><code>prediction_alert_ratio</code></td><td>far from the 5% budget</td><td>The rolling threshold is not tracking the traffic</td></tr>
+    <tr><td><code>evaluate_outcomes.py</code> (scheduled)</td><td>ROC-AUC falls; calibration gap opens</td><td>Recalibrate on recently delivered orders, or retrain</td></tr>
+    <tr><td><code>prediction_errors_total{error_type}</code></td><td>rising share of requests</td><td><code>validation</code>: an upstream data change &middot; <code>internal</code>: a service fault</td></tr>
+  </tbody>
+</table>
+<p class="small">The thresholds are in <code>config/settings.yaml</code> (<code>monitoring.psi_warn</code>, <code>psi_alert</code>, <code>alerting.budget</code>). The first three
+rules are also written in the post-deployment checklist in <code>docs/DEPLOYMENT.md</code>.</p>
+
+
+
+<!-- ======================= 11 CONFIG ======================= -->
+<h2>11. Every config value</h2>
+<p>All runtime settings are in <code>config/settings.yaml</code>, and secrets are in <code>.env</code>. <code>src/config.py</code> loads both,
+lets environment variables override the YAML, and stops the start-up on an invalid value.</p>
+<table>
+  <thead><tr><th style="width:30%">Key</th><th style="width:22%">Value</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><code>project.version</code></td><td><code>1.2.0</code></td><td>Service version reported by <code>/health</code>; the model version is separate (a hash)</td></tr>
+    <tr><td><code>model.source</code></td><td><code>registry</code></td><td>Load from MLflow; <code>local</code> reads <code>models/</code> (the tests use it)</td></tr>
+    <tr><td><code>model.registry_name / _alias / _stage</code></td><td><code>olist-late-predictor</code> / <code>production</code> / <code>Production</code></td><td>Which registered version to serve; the stage is kept for readers who look for it</td></tr>
+    <tr><td><code>model.registry_fallback_to_local</code></td><td><code>true</code></td><td>Keep serving the same bytes if MLflow is down (&sect;7.3)</td></tr>
+    <tr><td><code>model.*_path</code></td><td><code>models/&hellip;</code></td><td>The four artifacts: no path is written in the code</td></tr>
+    <tr><td><code>model.label_definition</code></td><td>calendar-day rule</td><td>Task 2's decision: the promise is a date, not an instant</td></tr>
+    <tr><td><code>inference.refit</code></td><td><code>false</code></td><td>Never fit at inference; <code>true</code> is refused</td></tr>
+    <tr><td><code>inference.batch_max_size</code></td><td><code>500</code></td><td>Bounds memory and latency per request (case 7 of &sect;6)</td></tr>
+    <tr><td><code>alerting.budget</code></td><td><code>0.05</code></td><td>Flag the riskiest 5%: Notebook 6 showed a budget carries across periods, a fixed threshold does not</td></tr>
+    <tr><td><code>alerting.window / min_window</code></td><td><code>1000</code> / <code>200</code></td><td>Recent scores used to place the threshold; below 200, use the validation threshold 0.7538</td></tr>
+    <tr><td><code>logging.level / format / file</code></td><td>INFO / <code>[time] [level] [name] msg</code> / <code>logs/service.log</code></td><td>Level overridable by <code>LOG_LEVEL</code></td></tr>
+    <tr><td><code>logging.max_bytes / backup_count</code></td><td>10 MB / 5</td><td>Log rotation, so the disk cannot fill</td></tr>
+    <tr><td><code>monitoring.prediction_log_file</code></td><td><code>logs/predictions.jsonl</code></td><td>One line per order, scorable later</td></tr>
+    <tr><td><code>monitoring.drift_window / drift_min_window</code></td><td><code>1000</code> / <code>200</code></td><td>PSI needs enough scores to be stable</td></tr>
+    <tr><td><code>monitoring.psi_warn / psi_alert</code></td><td><code>0.10</code> / <code>0.25</code></td><td>The usual PSI bands</td></tr>
+    <tr><td><code>validation.on_failure</code></td><td><code>reject</code></td><td>A wrong order is refused rather than scored silently; <code>flag</code> is the alternative</td></tr>
+    <tr><td><code>validation.ge_on_batch</code></td><td><code>true</code></td><td>Run the population checks on batches (about 0.9 s each)</td></tr>
+    <tr><td><code>validation.allowed_states / allowed_payment_types / numeric_ranges / coordinate_ranges</code></td><td>27 states, 4 types, GE ranges</td><td>Taken from the training data; longitude up to &minus;28 because 1,519 real orders in PE and PB lie east of &minus;35</td></tr>
+    <tr><td><code>.env</code>: <code>DB_*</code>, <code>MLFLOW_TRACKING_URI</code>, <code>API_PORT</code>, <code>MODEL_SOURCE</code></td><td>template: <code>.env.example</code></td><td>Secrets and connection strings; the file is gitignored</td></tr>
+  </tbody>
+</table>
+
+<!-- ======================= 12 TOOLS ======================= -->
+<h2>12. Every tool, and why it is there</h2>
+<table>
+  <thead><tr><th style="width:22%">Tool</th><th>Role in this project</th></tr></thead>
+  <tbody>
+    <tr><td>FastAPI + Pydantic</td><td>The HTTP service. The schemas reject bad payloads before any code runs, and they generate <code>/docs</code>.</td></tr>
+    <tr><td>Uvicorn</td><td>The server process that runs FastAPI inside the container.</td></tr>
+    <tr><td>scikit-learn, pandas, numpy</td><td>The Task 2 model and transformers, loaded at the exact versions they were pickled with.</td></tr>
+    <tr><td>Great Expectations</td><td>Statistical checks on batches: ranges, sets, missing rates.</td></tr>
+    <tr><td>DVC</td><td>Versions the artifacts; its md5 pointers are the reference the service checks against.</td></tr>
+    <tr><td>MLflow</td><td>Tracks the run (parameters, metrics, artifacts); the registry the API loads from; the artifact store the container can reach.</td></tr>
+    <tr><td>PostgreSQL</td><td>The Olist schema: the source of real outcomes for evaluating predictions later.</td></tr>
+    <tr><td>Prometheus client</td><td>Exposes request count, latency, errors and drift at <code>/metrics</code>.</td></tr>
+    <tr><td>Python <code>logging</code></td><td>Levels, one format, file and console, with rotation.</td></tr>
+    <tr><td>pytest (+ httpx)</td><td>173 tests with one command; httpx backs FastAPI's TestClient for the route tests.</td></tr>
+    <tr><td>ruff</td><td>Lint and format check, the same version in pre-commit and in CI.</td></tr>
+    <tr><td>pre-commit</td><td>Runs ruff and file checks before each commit, before CI sees it.</td></tr>
+    <tr><td>Docker / Compose</td><td>One image for the service; one command for the four-service stack.</td></tr>
+    <tr><td>GitHub Actions + ghcr.io</td><td>lint &rarr; tests &rarr; build; publishes the image only after all three pass.</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>
